@@ -2,5 +2,5 @@
 *.log
 .idea
 *.iml
-/node/data/
-/node/target/
+data/
+target/
