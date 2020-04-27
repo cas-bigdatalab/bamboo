@@ -5,9 +5,6 @@ import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
 class NodeService(ip: String, port: Int) {
 
   var shards: Array[ShardService] = null
@@ -32,21 +29,23 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     println("start node endpoint")
   }
 
+  val indices = new Indices("data/"+rpcEnv.address.hostPort.split(':').tail.head)
+
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
     case AttributeWrite(msg) => {
 //      val shard = Len(shards)
-      Indices.write(msg)
+      indices.write(msg)
       context.reply(s"write $msg")
     }
     case AttributeRead(msg) => {
-      context.reply(Indices.search(msg))
+      context.reply(indices.search(msg))
     }
     case AttributeDelete(msg) => {
-      Indices.delete(msg)
+      indices.delete(msg)
       context.reply(s"delete $msg")
     }
     case AllDeleting() => {
-      Indices.deleteAll()
+      indices.deleteAll()
       context.reply(s"delete all")
     }
   }

@@ -6,7 +6,6 @@ import cn.pandadb.costore.node.msg._
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc.{RpcAddress, RpcEndpointRef, RpcEnv, RpcEnvClientConfig}
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
-import org.apache.lucene.document.Document
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await

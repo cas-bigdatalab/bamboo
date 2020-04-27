@@ -10,18 +10,15 @@ import org.apache.lucene.queryparser.classic.{MultiFieldQueryParser, QueryParser
 import org.apache.lucene.search.{IndexSearcher, Query, ScoreDoc}
 import org.apache.lucene.store.FSDirectory
 
-import scala.collection.immutable.HashMap
+class Indices(dataPath: String) {
 
-object Indices {
-
-  val indexDir = "./data"
-
-  private val dir = FSDirectory.open(Paths.get(indexDir))
-  private val reader = DirectoryReader.open(dir)
+  private val dir = FSDirectory.open(Paths.get(dataPath))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
-
   val writer = new IndexWriter(dir, writerConfig)
+  writer.commit()
+
+  private val reader = DirectoryReader.open(dir)
   var searcher = new IndexSearcher(reader)
 
   private def createDocument(kv: Map[String, String]): Document = {
@@ -44,8 +41,8 @@ object Indices {
 
   def search(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]] = {
     val docs = new util.ArrayList[util.HashMap[String, String]]()
-    val hits = searcher.search(buildQuery(kv), 10)
-    println(hits.scoreDocs)
+    val hits = searcher.search(buildQuery(kv),10000)//TODO allow all results
+    println("hit: "+hits.scoreDocs.length)
     hits.scoreDocs.map(d => {
       val doc = new util.HashMap[String, String]()
       val fields = searcher.doc(d.doc).getFields()

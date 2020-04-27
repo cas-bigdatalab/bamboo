@@ -4,7 +4,7 @@ import org.junit.{After, Before, Test}
 import cn.pandadb.costore.cluster.Client
 import cn.pandadb.costore.node.{NodeRPC, NodeService}
 
-class ClientTest{
+class SingleNodeTest{
   val client = new Client(new NodeRPC("localhost", 11236))
   @Before
   def buildIndex(): Unit ={
