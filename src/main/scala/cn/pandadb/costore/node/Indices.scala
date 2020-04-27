@@ -18,7 +18,7 @@ class Indices(dataPath: String) {
   val writer = new IndexWriter(dir, writerConfig)
   writer.commit()
 
-  private val reader = DirectoryReader.open(dir)
+  val reader = DirectoryReader.open(dir)
   var searcher = new IndexSearcher(reader)
 
   private def createDocument(kv: Map[String, String]): Document = {
@@ -36,12 +36,15 @@ class Indices(dataPath: String) {
 
   def write(kv: Map[String, String]): Unit ={
     writer.addDocument(createDocument(kv))
-    writer.flush
+    writer.commit()
+    println("write: "+kv)
   }
 
   def search(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]] = {
     val docs = new util.ArrayList[util.HashMap[String, String]]()
     val hits = searcher.search(buildQuery(kv),10000)//TODO allow all results
+    println("query: "+buildQuery(kv))
+    println("msg: "+kv)
     println("hit: "+hits.scoreDocs.length)
     hits.scoreDocs.map(d => {
       val doc = new util.HashMap[String, String]()
@@ -57,12 +60,12 @@ class Indices(dataPath: String) {
 
   def delete(kv: Map[String, String]): Unit = {
     writer.deleteDocuments(buildQuery(kv))
-    writer.flush()
+    writer.commit()
   }
 
   def deleteAll(): Unit = {
     writer.deleteAll()
-    writer.flush()
+    writer.commit()
   }
   
 }
