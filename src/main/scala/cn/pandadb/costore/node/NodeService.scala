@@ -35,7 +35,6 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AttributeWrite(msg) => {
 //      val shard = Len(shards)
       indices.write(msg)
-      println("numDocs " + indices.reader.numDocs())
       context.reply(s"write $msg")
     }
     case AttributeRead(msg) => {

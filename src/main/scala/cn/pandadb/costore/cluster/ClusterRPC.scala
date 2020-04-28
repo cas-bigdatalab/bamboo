@@ -39,12 +39,6 @@ class ClusterRPC(ip: String, port: Int) extends NodeRPC (ip: String, port: Int) 
   }
 
   override def deleteAll(): Unit = {
-    val future = endPointRef.ask[String](AllDeleting())
-    future.onComplete {
-      case scala.util.Success(value) => println(s"Got the result = $value")
-      case scala.util.Failure(e) => println(s"Got error: $e")
-    }
-    Await.result(future, Duration.apply("30s"))
+    liveNodes.foreach( n => n.deleteAll())
   }
-
 }
