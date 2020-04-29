@@ -1,4 +1,4 @@
-package cn.pandadb.costore.node
+package cn.pandadb.costore.shard
 
 import java.nio.file.Paths
 import java.util
@@ -10,9 +10,8 @@ import org.apache.lucene.queryparser.classic.{MultiFieldQueryParser, QueryParser
 import org.apache.lucene.search.{IndexSearcher, Query, ScoreDoc}
 import org.apache.lucene.store.FSDirectory
 
-class Indices(dataPath: String) {
-
-  private val dir = FSDirectory.open(Paths.get(dataPath))
+class Shard(val id: Int) {
+  private val dir = FSDirectory.open(Paths.get("data/shard_"+id))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)

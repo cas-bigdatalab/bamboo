@@ -1,4 +1,4 @@
-package cn.pandadb.costore.node
+package cn.pandadb.costore.shard
 
 import msg._
 import net.neoremind.kraps.RpcConf
@@ -6,8 +6,6 @@ import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
 class NodeService(ip: String, port: Int) {
-
-  var shards: Array[ShardService] = null
 
   val config = RpcEnvServerConfig(new RpcConf(), "node-server", ip, port)
   val rpcEnv: RpcEnv = NettyRpcEnvFactory.create(config)
@@ -29,23 +27,20 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     println("start node endpoint")
   }
 
-  val indices = new Indices("data/"+rpcEnv.address.hostPort.split(':').tail.head)
-
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
-    case AttributeWrite(msg) => {
-//      val shard = Len(shards)
-      indices.write(msg)
+    case AttributeWrite(msg, shard: Int) => {
+      new Shard(shard).write(msg)
       context.reply(s"write $msg")
     }
-    case AttributeRead(msg) => {
-      context.reply(indices.search(msg))
+    case AttributeRead(msg, shard: Int) => {
+      context.reply(new Shard(shard).search(msg))
     }
-    case AttributeDelete(msg) => {
-      indices.delete(msg)
+    case AttributeDelete(msg, shard: Int) => {
+      new Shard(shard).delete(msg)
       context.reply(s"delete $msg")
     }
-    case AllDeleting() => {
-      indices.deleteAll()
+    case AllDeleting(shard: Int) => {
+      new Shard(shard).deleteAll()
       context.reply(s"delete all")
     }
   }

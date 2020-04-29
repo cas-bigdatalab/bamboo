@@ -1,6 +1,6 @@
 import java.util
 
-import cn.pandadb.costore.node.{NodeRPC, NodeService}
+import cn.pandadb.costore.shard.{NodeRPC, NodeService}
 import org.junit.{After, Before, Test}
 
 class ServiceTest1{
