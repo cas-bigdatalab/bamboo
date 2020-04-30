@@ -1,8 +1,8 @@
-import cn.pandadb.costore.cluster.ClusterRPC
+import cn.pandadb.costore.{Client, NodeRpc}
 import org.junit.{After, Before, Test}
 
-class ClusterTest{
-  val client = new ClusterRPC("localhost", 11236)
+class ClientTest{
+  val client = new Client(new NodeRpc("localhost", 11234))
 
   @Before
   def buildIndex(): Unit ={

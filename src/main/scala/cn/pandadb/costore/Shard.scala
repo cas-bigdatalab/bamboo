@@ -1,13 +1,13 @@
-package cn.pandadb.costore.shard
+package cn.pandadb.costore
 
 import java.nio.file.Paths
 import java.util
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer
-import org.apache.lucene.document.{Document, Field, StringField, TextField}
-import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig, IndexableField}
-import org.apache.lucene.queryparser.classic.{MultiFieldQueryParser, QueryParser}
-import org.apache.lucene.search.{IndexSearcher, Query, ScoreDoc}
+import org.apache.lucene.document.{Document, Field, TextField}
+import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser
+import org.apache.lucene.search.{IndexSearcher, Query}
 import org.apache.lucene.store.FSDirectory
 
 class Shard(val id: Int) {
