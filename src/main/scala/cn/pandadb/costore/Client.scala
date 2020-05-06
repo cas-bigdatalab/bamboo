@@ -2,9 +2,12 @@ package cn.pandadb.costore
 
 import java.util
 
-class Client(val coordinator: NodeRpc) { //TODO: hippo rpc
+class Client(val address: String) { //TODO: hippo rpc
+
+  val coordinator = new NodeRpc(address)
 
   def filterNodes(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]]  = {
+    println(s"search $kv:")
     coordinator.filterNodes(kv, -1)
   }
 
@@ -19,5 +22,4 @@ class Client(val coordinator: NodeRpc) { //TODO: hippo rpc
   def deleteAll(): Unit = {
     coordinator.deleteAll(-1)
   }
-
 }

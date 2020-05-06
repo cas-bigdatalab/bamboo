@@ -8,11 +8,13 @@ import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
-class NodeService(val ip: String, val port: Int) {
+class NodeService(val address: String) {
 
-  val config = RpcEnvServerConfig(new RpcConf(), "node-server", ip, port)
-  val rpcEnv: RpcEnv = NettyRpcEnvFactory.create(config)
-  var endPointRef: RpcEndpointRef = null
+  private val ipPort = address.split(':')
+  val ip = ipPort(0)
+  val port = ipPort(1).toInt
+  private val config = RpcEnvServerConfig(new RpcConf(), "node-server", ip, port)
+  private val rpcEnv: RpcEnv = NettyRpcEnvFactory.create(config)
 
   def start() = {
     rpcEnv.setupEndpoint("node-service", new NodeEndpoint(rpcEnv))
@@ -22,9 +24,12 @@ class NodeService(val ip: String, val port: Int) {
   def stop() = {
     rpcEnv.shutdown()
   }
+
 }
 
 class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
+
+  private lazy val peerRpcs = globalConfig.nodes.map(address => (address -> new NodeRpc(address))).toMap
 
   override def onStart(): Unit = {
     println("start node endpoint")
@@ -32,25 +37,56 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
 
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
     case AttributeWrite(msg, shardID) => {
-      println(msg, shardID)
-      globalConfig.shards(shardID).write(msg)
-      context.reply(s"write $msg")
-    }
-    case AttributeRead(msg, shardID) => {
-      if (shardID == -1) {
-        val ret = new util.ArrayList[util.HashMap[String, String]]()
-        globalConfig.shards2Nodes.foreach(shardNode => ret.addAll(shardNode._2.filterNodes(kv, shardNode._1)))
-        return context.reply(ret)
+      shardID match {
+        case -1 => {
+          val (node, shardID) = globalConfig.route(msg)
+          peerRpcs.get(node).get.addNode(msg, shardID)
+          context.reply(s"write $msg to shard $shardID on node $node")
+        }
+        case _ => {
+          println(msg, shardID)
+          globalConfig.shards(shardID).write(msg)
+          context.reply(s"write $msg to local shard $shardID")
+        }
       }
-      context.reply(globalConfig.shards(shardID).search(msg))
+    }
+    case AttributeRead(msg, shardID) =>{
+      shardID match {
+        case -1 => {
+          val ret = new util.ArrayList[util.HashMap[String, String]]()
+          globalConfig.shards2Nodes.foreach(shardNode => ret.addAll(peerRpcs.get(shardNode._2).get.filterNodes(msg, shardNode._1)))
+          context.reply(ret)
+        }
+        case _ => {
+          context.reply(globalConfig.shards(shardID).search(msg))
+        }
+      }
     }
     case AttributeDelete(msg, shardID) => {
-      globalConfig.shards(shardID).delete(msg)
-      context.reply(s"delete $msg")
+      shardID match {
+        case -1 => {
+          val (node, shardID) = globalConfig.route(msg)
+          peerRpcs.get(node).get.deleteNode(msg, shardID)
+          context.reply(s"delete $msg from shard $shardID on node $node")
+        }
+        case _ => {
+          globalConfig.shards(shardID).delete(msg)
+          context.reply(s"delete $msg from local shard $shardID")
+        }
+      }
     }
     case AllDeleting(shardID) => {
-      globalConfig.shards(shardID).deleteAll()
-      context.reply(s"delete all")
+      shardID match {
+        case -1 => {
+          globalConfig.shards2Nodes.foreach(shardNode => peerRpcs.get(shardNode._2).get.deleteAll(shardNode._1))
+          context.reply(s"delete all from all shards")
+        }
+        case _ => {
+          globalConfig.shards(shardID).deleteAll()
+          context.reply(s"delete all from local shard $shardID")
+        }
+      }
+
     }
   }
 

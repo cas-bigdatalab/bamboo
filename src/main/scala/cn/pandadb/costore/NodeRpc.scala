@@ -12,9 +12,12 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
-class NodeRpc(val ip: String, val port: Int) {
+class NodeRpc(val address: String) {
 
-  val endPointRef = NettyRpcEnvFactory.create(
+  private val ipPort = address.split(':')
+  val ip = ipPort(0)
+  val port = ipPort(1).toInt
+  private lazy val endPointRef = NettyRpcEnvFactory.create(
       RpcEnvClientConfig( new RpcConf(), "node-client")
     ).setupEndpointRef(
       new RpcAddress(ip, port),
@@ -26,38 +29,27 @@ class NodeRpc(val ip: String, val port: Int) {
   }
 
   def addNode(docsToAdded: Map[String, String], shardID: Int = -1): Unit = {
-    if (shardID == -1){
-      val (node, shard) = globalConfig.route(docsToAdded)
-      return node.addNode(docsToAdded,shard)
-    }
     val future = endPointRef.ask[String](AttributeWrite(docsToAdded, shardID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"Got the result = $value")
+      case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
     Await.result(future, Duration.apply("30s"))
   }
 
   def deleteNode(docsToBeDeleted: Map[String, String], shardID: Int = -1): Unit = {
-    if (shardID == -1){
-      val (node, shard) = globalConfig.route(docsToBeDeleted)
-      return node.deleteNode(docsToBeDeleted,shard)
-    }
     val future = endPointRef.ask[String](AttributeDelete(docsToBeDeleted, shardID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"Got the result = $value")
+      case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
     Await.result(future, Duration.apply("30s"))
   }
 
   def deleteAll(shardID: Int = -1): Unit = {
-    if (shardID == -1){
-      return globalConfig.shards2Nodes.foreach(shardNode => shardNode._2.deleteAll(shardNode._1))
-    }
     val future = endPointRef.ask[String](AllDeleting(shardID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"Got the result = $value")
+      case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
     Await.result(future, Duration.apply("30s"))
