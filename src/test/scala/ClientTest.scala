@@ -7,7 +7,7 @@ class ClientTest{
 
   @Before
   def buildIndex(): Unit ={
-    client.addNode(Map("id" -> "1", "name" -> "blue", "url" -> "talent.com"))
+    client.addNode(Map("id" -> "1", "name" -> "bluejoe", "url" -> "talent.com"))
     client.addNode(Map("id" -> "2", "name" -> "excelwang", "url" -> "talent.com"))
     client.addNode(Map("id" -> "3", "name" -> "zhongxin", "url" -> "talent.com"))
   }
@@ -19,7 +19,7 @@ class ClientTest{
 
   @Test
   def search(): Unit ={
-    val ret = client.filterNodes(Map(("name" -> "blue")))
+    val ret = client.filterNodes(Map(("name" -> "bluejoe")))
     println(ret)
   }
 
