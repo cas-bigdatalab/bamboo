@@ -29,61 +29,71 @@ class NodeService(val address: String) {
 
 class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
 
-  private lazy val peerRpcs = globalConfig.nodes.map(address => (address -> new NodeRpc(address))).toMap
+  private lazy val peerRpcs = globalConfig.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
+  private lazy val vNodes = globalConfig.vNodeID2NodeInfo.filter(
+    vNodeIDNodeInfo => vNodeIDNodeInfo._2 == rpcEnv.address.hostPort
+  ).map(vNodeIDNodeInfo => (vNodeIDNodeInfo._1 -> new VNode(vNodeIDNodeInfo._1)))
 
   override def onStart(): Unit = {
     println("start node endpoint")
   }
 
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
-    case AttributeWrite(msg, shardID) => {
-      shardID match {
+    case AttributeWrite(msg, vNodeID) => {
+      vNodeID match {
         case -1 => {
-          val (node, shardID) = globalConfig.route(msg)
-          peerRpcs.get(node).get.addNode(msg, shardID)
-          context.reply(s"write $msg to shard $shardID on node $node")
+          globalConfig.route(msg).map(vNodeIDNodeInfo => {
+            val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
+            rpc.addNode(msg, vNodeIDNodeInfo._1)
+          })
+          context.reply(s"coordinator ${rpcEnv.address}: writing $msg")
         }
         case _ => {
-          println(msg, shardID)
-          globalConfig.shards(shardID).write(msg)
-          context.reply(s"write $msg to local shard $shardID")
+          vNodes.get(vNodeID).get.write(msg)
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg written")
         }
       }
     }
-    case AttributeRead(msg, shardID) =>{
-      shardID match {
+    case AttributeRead(msg, vNodeID) =>{
+      vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()
-          globalConfig.shards2Nodes.foreach(shardNode => ret.addAll(peerRpcs.get(shardNode._2).get.filterNodes(msg, shardNode._1)))
+          globalConfig.vNodeID2NodeInfo.foreach(vNodeNode =>
+            ret.addAll(peerRpcs.get(vNodeNode._2).get.filterNodes(msg, vNodeNode._1))
+          )
           context.reply(ret)
         }
         case _ => {
-          context.reply(globalConfig.shards(shardID).search(msg))
+          context.reply(vNodes.get(vNodeID).get.search(msg))
         }
       }
     }
-    case AttributeDelete(msg, shardID) => {
-      shardID match {
+    case AttributeDelete(msg, vNodeID) => {
+      vNodeID match {
         case -1 => {
-          val (node, shardID) = globalConfig.route(msg)
-          peerRpcs.get(node).get.deleteNode(msg, shardID)
-          context.reply(s"delete $msg from shard $shardID on node $node")
+          globalConfig.route(msg).map(vNodeIDNodeInfo => {
+            val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
+            rpc.deleteNode(msg, vNodeIDNodeInfo._1)
+          })
+          context.reply(s"coordinator ${rpcEnv.address}: deleting $msg")
         }
         case _ => {
-          globalConfig.shards(shardID).delete(msg)
-          context.reply(s"delete $msg from local shard $shardID")
+          vNodes.get(vNodeID).get.delete(msg)
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg deleted")
         }
       }
     }
-    case AllDeleting(shardID) => {
-      shardID match {
+    case AllDeleting(vNodeID) => {
+      vNodeID match {
         case -1 => {
-          globalConfig.shards2Nodes.foreach(shardNode => peerRpcs.get(shardNode._2).get.deleteAll(shardNode._1))
-          context.reply(s"delete all from all shards")
+          globalConfig.vNodeID2NodeInfo.foreach(vNodeNode =>
+            peerRpcs.get(vNodeNode._2).get.deleteAll(vNodeNode._1)
+          )
+          context.reply(s"coordinator ${rpcEnv.address}: deleting all from all vNodes")
         }
         case _ => {
-          globalConfig.shards(shardID).deleteAll()
-          context.reply(s"delete all from local shard $shardID")
+          vNodes.get(vNodeID).get.deleteAll()
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: all deleted")
         }
       }
 

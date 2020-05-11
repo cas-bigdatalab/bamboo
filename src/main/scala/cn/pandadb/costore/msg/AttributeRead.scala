@@ -1,3 +1,3 @@
 package cn.pandadb.costore.msg
 
-case class AttributeRead(msg: Map[String, String], shardID: Int)
+case class AttributeRead(msg: Map[String, String], vNodeID: Int)

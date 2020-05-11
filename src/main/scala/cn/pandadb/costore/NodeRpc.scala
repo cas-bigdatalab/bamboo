@@ -24,12 +24,12 @@ class NodeRpc(val address: String) {
       "node-service"
     )
 
-  def filterNodes(kv: Map[String, String], shardID: Int = -1): util.ArrayList[util.HashMap[String, String]]  = {
-    endPointRef.askWithRetry[util.ArrayList[util.HashMap[String, String]]](AttributeRead(kv, shardID))
+  def filterNodes(kv: Map[String, String], vNodeID: Int = -1): util.ArrayList[util.HashMap[String, String]]  = {
+    endPointRef.askWithRetry[util.ArrayList[util.HashMap[String, String]]](AttributeRead(kv, vNodeID))
   }
 
-  def addNode(docsToAdded: Map[String, String], shardID: Int = -1): Unit = {
-    val future = endPointRef.ask[String](AttributeWrite(docsToAdded, shardID))
+  def addNode(docsToAdded: Map[String, String], vNodeID: Int = -1): Unit = {
+    val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
     future.onComplete {
       case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
@@ -37,8 +37,8 @@ class NodeRpc(val address: String) {
     Await.result(future, Duration.apply("30s"))
   }
 
-  def deleteNode(docsToBeDeleted: Map[String, String], shardID: Int = -1): Unit = {
-    val future = endPointRef.ask[String](AttributeDelete(docsToBeDeleted, shardID))
+  def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: Int = -1): Unit = {
+    val future = endPointRef.ask[String](AttributeDelete(docsToBeDeleted, vNodeID))
     future.onComplete {
       case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
@@ -46,8 +46,8 @@ class NodeRpc(val address: String) {
     Await.result(future, Duration.apply("30s"))
   }
 
-  def deleteAll(shardID: Int = -1): Unit = {
-    val future = endPointRef.ask[String](AllDeleting(shardID))
+  def deleteAll(vNodeID: Int = -1): Unit = {
+    val future = endPointRef.ask[String](AllDeleting(vNodeID))
     future.onComplete {
       case scala.util.Success(value) => println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")

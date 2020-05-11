@@ -10,8 +10,8 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser
 import org.apache.lucene.search.{IndexSearcher, Query}
 import org.apache.lucene.store.FSDirectory
 
-class Shard(val id: Int) {
-  private val dir = FSDirectory.open(Paths.get("data/shard_"+id))
+class VNode(val id: Int) {
+  private val dir = FSDirectory.open(Paths.get("data/vNode_"+id))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
@@ -33,9 +33,7 @@ class Shard(val id: Int) {
   def write(kv: Map[String, String]): Unit ={
     writer.addDocument(createDocument(kv))
     writer.commit()
-    println("write: "+kv)
     val reader = DirectoryReader.open(dir)
-    println("after write, numDocs: " + reader.numDocs())
     reader.close()
   }
 
@@ -44,9 +42,6 @@ class Shard(val id: Int) {
     val reader = DirectoryReader.open(dir)
     val searcher = new IndexSearcher(reader)
     val hits = searcher.search(buildQuery(kv),10000)//TODO allow all results
-    println("query: "+buildQuery(kv))
-    println("msg: "+kv)
-    println("hit: "+hits.scoreDocs.length)
     hits.scoreDocs.map(d => {
       val doc = new util.HashMap[String, String]()
       val fields = searcher.doc(d.doc).getFields()
@@ -64,7 +59,6 @@ class Shard(val id: Int) {
     writer.deleteDocuments(buildQuery(kv))
     writer.commit()
     val reader = DirectoryReader.open(dir)
-    println("after delete, numDocs: " + reader.numDocs())
     reader.close()
   }
 
@@ -72,7 +66,6 @@ class Shard(val id: Int) {
     writer.deleteAll()
     writer.commit()
     val reader = DirectoryReader.open(dir)
-    println("after delete all, numDocs: " + reader.numDocs())
     reader.close()
   }
   

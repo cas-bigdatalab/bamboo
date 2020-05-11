@@ -1,16 +1,19 @@
 package cn.pandadb.costore.config
 
-import cn.pandadb.costore.{NodeRpc, Shard}
+import cn.pandadb.costore.utils.ConsistentHashRing
 
 object globalConfig {
-  val shards = List(new Shard(0), new Shard(1), new Shard(2))
-  val nodes = List("localhost:11234", "localhost:11235", "localhost:11236")
-  val shards2Nodes = Map(0 -> nodes(0), 1 -> nodes(1), 2 -> nodes(2))
+  val replicaFactor = 3
+  val nodesInfo = List("localhost:11234", "localhost:11235", "localhost:11236")
+  val vNodeIDs = List(0 until nodesInfo.length * 3: _*)
+  val vNodeID2NodeInfo = vNodeIDs.map(vid => (vid -> nodesInfo(vid % nodesInfo.length))).toMap
+  val vNodeRing = new ConsistentHashRing(vNodeIDs.map(id => id.toString))
 
-  def route(node: Map[String, String]): (String, Int) = {
-    val targetShardID = node.get("id").get.toInt%shards.length
-    val targetNode = shards2Nodes.get(targetShardID).get
-    (targetNode, targetShardID)
+  def route(node: Map[String, String]): List[(Int, String)] = {
+    vNodeRing.getHolders(node.get("id").get, replicaFactor).map(hid => {
+      val id =  hid.toInt
+      (id, vNodeID2NodeInfo.get(id).get)
+    })
   }
 
 }

@@ -1,10 +1,10 @@
 import cn.pandadb.costore.NodeService
-import cn.pandadb.costore.config.globalConfig.nodes
+import cn.pandadb.costore.config.globalConfig
 import org.junit.{After, Test}
 
 class ServiceTest{
 
-  val services = nodes.map(n => new NodeService(n))
+  val services = globalConfig.nodesInfo.map(n => new NodeService(n))
 
   @Test
   def start(): Unit ={
