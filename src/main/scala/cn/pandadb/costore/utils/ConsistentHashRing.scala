@@ -9,7 +9,7 @@ class ConsistentHashRing(val identities: List[String]) {
   def getHolders(beHeldID: String, size: Int): List[String] = {
     var itr = ring.iteratorFrom(stringHash(beHeldID))
     List(1 to  size).map(s => {
-      itr = if(itr.hasNext) itr else ring.toIterator
+      itr = if(itr.hasNext) itr else ring.iterator
       itr.next()._2
     })
   }
