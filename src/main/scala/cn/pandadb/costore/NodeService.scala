@@ -54,7 +54,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
         }
       }
     }
-    case AttributeRead(msg, vNodeID) =>{
+    case AttributeRead(msg, vNodeID) =>{//TODO: change read  from  main  replica  to choose replica
       vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()

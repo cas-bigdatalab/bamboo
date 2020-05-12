@@ -16,6 +16,8 @@ class VNode(val id: Int) {
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
   writer.commit()
+  val reader = DirectoryReader.open(dir)
+  val searcher = new IndexSearcher(reader)
 
   private def createDocument(kv: Map[String, String]): Document = {
     val document = new Document()
@@ -33,14 +35,10 @@ class VNode(val id: Int) {
   def write(kv: Map[String, String]): Unit ={
     writer.addDocument(createDocument(kv))
     writer.commit()
-    val reader = DirectoryReader.open(dir)
-    reader.close()
   }
 
   def search(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]] = {
     val docs = new util.ArrayList[util.HashMap[String, String]]()
-    val reader = DirectoryReader.open(dir)
-    val searcher = new IndexSearcher(reader)
     val hits = searcher.search(buildQuery(kv),10000)//TODO allow all results
     hits.scoreDocs.map(d => {
       val doc = new util.HashMap[String, String]()
@@ -51,22 +49,17 @@ class VNode(val id: Int) {
       }
       docs.add(doc)
     })
-    reader.close()
     docs
   }
 
   def delete(kv: Map[String, String]): Unit = {
     writer.deleteDocuments(buildQuery(kv))
     writer.commit()
-    val reader = DirectoryReader.open(dir)
-    reader.close()
   }
 
   def deleteAll(): Unit = {
     writer.deleteAll()
     writer.commit()
-    val reader = DirectoryReader.open(dir)
-    reader.close()
   }
   
 }

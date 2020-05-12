@@ -31,7 +31,7 @@ class NodeRpc(val address: String) {
   def addNode(docsToAdded: Map[String, String], vNodeID: Int = -1): Unit = {
     val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"$value")
+      case scala.util.Success(value) => {}// println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
     Await.result(future, Duration.apply("30s"))
