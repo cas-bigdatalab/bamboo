@@ -3,6 +3,7 @@ package cn.pandadb.costore
 import java.nio.file.Paths
 import java.util
 
+import cn.pandadb.costore.config.globalConfig
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.document.{Document, Field, TextField}
 import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}
@@ -15,7 +16,17 @@ class VNode(val id: Int) {
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
-  writer.commit()
+
+  flushPeriodically()
+
+  private def flushPeriodically(): java.util.TimerTask ={
+    val t = new java.util.Timer()
+    val task = new java.util.TimerTask {
+      def run() = writer.commit()
+    }
+    t.schedule(task, globalConfig.flushInterval, globalConfig.flushInterval)
+    task
+  }
   val reader = DirectoryReader.open(dir)
   val searcher = new IndexSearcher(reader)
 
