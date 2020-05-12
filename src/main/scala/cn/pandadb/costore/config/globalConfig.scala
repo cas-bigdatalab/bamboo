@@ -4,8 +4,9 @@ import cn.pandadb.costore.utils.ConsistentHashRing
 
 object globalConfig {
   val replicaFactor = 3
+  val vNodeNumberPerNode = 3//TODO config per node
   val nodesInfo = List("localhost:11234", "localhost:11235", "localhost:11236")
-  val vNodeIDs = List(0 until nodesInfo.length * 3: _*)
+  val vNodeIDs = 0 until nodesInfo.length * vNodeNumberPerNode toList
   val vNodeID2NodeInfo = vNodeIDs.map(vid => (vid -> nodesInfo(vid % nodesInfo.length))).toMap
   val vNodeRing = new ConsistentHashRing(vNodeIDs.map(id => id.toString))
 
