@@ -16,6 +16,7 @@ class VNode(val id: Int) {
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
+  writer.commit()
 
   flushPeriodically()
 

@@ -8,6 +8,7 @@ import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
+
 class NodeService(val address: String) {
 
   private val ipPort = address.split(':')
