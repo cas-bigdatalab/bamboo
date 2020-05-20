@@ -3,7 +3,7 @@ import org.junit.{After, Before, Test}
 
 class PerformanceTest{
 
-  val client = new Client("localhost:11234")
+  val client = new Client(List("localhost:11234"))
 
   @Test
   def buildIndex(): Unit ={
