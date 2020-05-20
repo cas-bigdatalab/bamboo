@@ -43,9 +43,9 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AttributeWrite(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          globalConfig.route(msg).map(vNodeIDNodeInfo => {
+          globalConfig.route(msg).par.map(vNodeIDNodeInfo => {
             val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
-            rpc.addNode(msg, vNodeIDNodeInfo._1)
+            rpc.addNodeWithRetry(msg, vNodeIDNodeInfo._1)
           })
           context.reply(s"coordinator ${rpcEnv.address}: writing $msg")
         }
