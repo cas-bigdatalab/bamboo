@@ -38,7 +38,7 @@ class NodeRpc(val address: String) {
   }
 
   def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: Int): Unit = {
-    endPointRef.askWithRetry[util.ArrayList[util.HashMap[String, String]]](AttributeWrite(docsToAdded, vNodeID))
+    endPointRef.askWithRetry[String](AttributeWrite(docsToAdded, vNodeID))
   }
 
   def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: Int = -1): Unit = {
