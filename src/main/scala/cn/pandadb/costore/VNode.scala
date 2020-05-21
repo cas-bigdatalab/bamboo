@@ -16,7 +16,6 @@ class VNode(val id: Int) {
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
-  writer.commit()
 
   private val task = new java.util.TimerTask {def run() = writer.commit()}
   new java.util.Timer().schedule(task, globalConfig.flushInterval, globalConfig.flushInterval)
