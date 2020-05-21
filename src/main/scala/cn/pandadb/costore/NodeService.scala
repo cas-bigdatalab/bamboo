@@ -43,7 +43,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AttributeWrite(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          globalConfig.route(msg).par.map(vNodeIDNodeInfo => {
+          globalConfig.route(msg).par.foreach(vNodeIDNodeInfo => {
             val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
             rpc.addNodeWithRetry(msg, vNodeIDNodeInfo._1)
           })
@@ -59,7 +59,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
       vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()
-          globalConfig.vNodeID2NodeInfo.foreach(vNodeNode =>
+          globalConfig.vNodeID2NodeInfo.par.foreach(vNodeNode =>
             ret.addAll(peerRpcs.get(vNodeNode._2).get.filterNodes(msg, vNodeNode._1))
           )
           context.reply(ret)

@@ -11,12 +11,14 @@ class RemotePerformanceTest{
     (1  to warmIters).foreach(id  =>  {
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
-    val itersOuter = 1000//
+    val itersOuter = 100//
     val itersInner = 500//
     val start = System.currentTimeMillis
     (1  to itersOuter).foreach(oid  =>  {
       (1  to itersInner).par.foreach(id  =>  {
-        client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
+        val pid = id+itersInner*(oid-1)
+        val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
+        client.addNode(doc)
       })
       Thread.sleep(10)
     })
@@ -31,7 +33,7 @@ class RemotePerformanceTest{
 
   @Test
   def search(): Unit ={
-    val ret = client.filterNodes(Map(("name" -> "bluejoe_1024")))
+    val ret = client.filterNodes(Map("name" -> "bluejoe_100"))
     println(ret)
   }
 

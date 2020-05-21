@@ -18,16 +18,10 @@ class VNode(val id: Int) {
   val writer = new IndexWriter(dir, writerConfig)
   writer.commit()
 
-  flushPeriodically()
+  private val task = new java.util.TimerTask {def run() = writer.commit()}
+  new java.util.Timer().schedule(task, globalConfig.flushInterval, globalConfig.flushInterval)
+  task.run()
 
-  private def flushPeriodically(): java.util.TimerTask ={
-    val t = new java.util.Timer()
-    val task = new java.util.TimerTask {
-      def run() = writer.commit()
-    }
-    t.schedule(task, globalConfig.flushInterval, globalConfig.flushInterval)
-    task
-  }
   val reader = DirectoryReader.open(dir)
   val searcher = new IndexSearcher(reader)
 
