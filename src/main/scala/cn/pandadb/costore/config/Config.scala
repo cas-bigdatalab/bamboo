@@ -6,9 +6,8 @@ class Config(val nodesInfo: List[String]) {
   val vNodeID2NodeInfo = vNodeIDs.map(vid => (vid -> nodesInfo(vid % nodesInfo.length))).toMap
   val vNodeRing = new ConsistentHashRing(vNodeIDs.map(id => id.toString))
   def route(node: Map[String, String]): List[(Int, String)] = {
-    vNodeRing.getHolders(node.get("id").get, globalConfig.replicaFactor).map(hid => {
-      val id =  hid.toInt
-      (id, vNodeID2NodeInfo.get(id).get)
-    })
+    val primaryVNodeID = vNodeRing.getHolder(node.get("id").get, globalConfig.replicaFactor).toInt
+    val beginIndex = nodesInfo.indexOf(vNodeID2NodeInfo.get(primaryVNodeID).get)
+    (0 until globalConfig.replicaFactor).toList.map(inc => (primaryVNodeID, nodesInfo(beginIndex+inc)))
   }
 }

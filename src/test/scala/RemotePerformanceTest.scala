@@ -11,6 +11,7 @@ class RemotePerformanceTest{
     (1  to warmIters).foreach(id  =>  {
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
+    client.deleteAll()
     val itersOuter = 100//
     val itersInner = 500//
     val start = System.currentTimeMillis
