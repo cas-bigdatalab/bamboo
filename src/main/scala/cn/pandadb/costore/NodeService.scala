@@ -2,14 +2,14 @@ package cn.pandadb.costore
 
 import java.util
 
-import cn.pandadb.costore.config.globalConfig
+import cn.pandadb.costore.config.Config
 import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
 
-class NodeService(val address: String) {
+class NodeService(val address: String, val peers: List[String]) {
 
   private val ipPort = address.split(':')
   val ip = ipPort(0)
@@ -18,7 +18,7 @@ class NodeService(val address: String) {
   private val rpcEnv: RpcEnv = NettyRpcEnvFactory.create(config)
 
   def start() = {
-    rpcEnv.setupEndpoint("node-service", new NodeEndpoint(rpcEnv))
+    rpcEnv.setupEndpoint("node-service", new NodeEndpoint(rpcEnv, peers))
     rpcEnv.awaitTermination()
   }
 
@@ -28,10 +28,11 @@ class NodeService(val address: String) {
 
 }
 
-class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
+class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String]) extends RpcEndpoint {
 
-  private lazy val peerRpcs = globalConfig.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
-  private lazy val vNodes = globalConfig.vNodeID2NodeInfo.filter(
+  private val config = new Config(peers)
+  private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
+  private lazy val vNodes = config.vNodeID2NodeInfo.filter(
     vNodeIDNodeInfo => vNodeIDNodeInfo._2 == rpcEnv.address.hostPort
   ).map(vNodeIDNodeInfo => (vNodeIDNodeInfo._1 -> new VNode(vNodeIDNodeInfo._1)))
 
@@ -43,7 +44,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AttributeWrite(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          globalConfig.route(msg).par.foreach(vNodeIDNodeInfo => {
+          config.route(msg).par.foreach(vNodeIDNodeInfo => {
             val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
             rpc.addNodeWithRetry(msg, vNodeIDNodeInfo._1)
           })
@@ -59,7 +60,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
       vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()
-          globalConfig.vNodeID2NodeInfo.par.foreach(vNodeNode =>
+          config.vNodeID2NodeInfo.par.foreach(vNodeNode =>
             ret.addAll(peerRpcs.get(vNodeNode._2).get.filterNodes(msg, vNodeNode._1))
           )
           context.reply(ret)
@@ -72,7 +73,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AttributeDelete(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          globalConfig.route(msg).map(vNodeIDNodeInfo => {
+          config.route(msg).map(vNodeIDNodeInfo => {
             val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
             rpc.deleteNode(msg, vNodeIDNodeInfo._1)
           })
@@ -87,7 +88,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint {
     case AllDeleting(vNodeID) => {
       vNodeID match {
         case -1 => {
-          globalConfig.vNodeID2NodeInfo.foreach(vNodeNode =>
+          config.vNodeID2NodeInfo.foreach(vNodeNode =>
             peerRpcs.get(vNodeNode._2).get.deleteAll(vNodeNode._1)
           )
           context.reply(s"coordinator ${rpcEnv.address}: deleting all from all vNodes")
