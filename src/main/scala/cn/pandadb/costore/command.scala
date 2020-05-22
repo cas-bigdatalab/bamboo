@@ -124,12 +124,20 @@ private class StartNodeShellCommandExecutor extends ShellCommandExecutor {
       .hasArg
       .required(true)
       .build())
+
+    options.addOption(Option.builder("replicaFactor")
+      .argName("replicaFactor")
+      .desc("the number of replica, e.g 3")
+      .hasArg
+      .required(true)
+      .build())
   }
 
   override def run(commandLine: CommandLine): Unit = {
     val address = commandLine.getOptionValue("ipPort")
     val peers = commandLine.getOptionValue("ipPort").split(',').toList
-    new NodeService(address, peers).start()
+    val replicaFactor = commandLine.getOptionValue("replicaFactor")
+    new NodeService(address, peers, replicaFactor).start()
   }
 
 }

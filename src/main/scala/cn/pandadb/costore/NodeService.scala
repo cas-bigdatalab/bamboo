@@ -9,7 +9,7 @@ import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
 
-class NodeService(val address: String, val peers: List[String]) {
+class NodeService(val address: String, val peers: List[String], val replicaFactor: Int) {
 
   private val ipPort = address.split(':')
   val ip = ipPort(0)
@@ -18,7 +18,7 @@ class NodeService(val address: String, val peers: List[String]) {
   private val rpcEnv: RpcEnv = NettyRpcEnvFactory.create(config)
 
   def start() = {
-    rpcEnv.setupEndpoint("node-service", new NodeEndpoint(rpcEnv, peers))
+    rpcEnv.setupEndpoint("node-service", new NodeEndpoint(rpcEnv, peers, replicaFactor))
     rpcEnv.awaitTermination()
   }
 
@@ -28,11 +28,11 @@ class NodeService(val address: String, val peers: List[String]) {
 
 }
 
-class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String]) extends RpcEndpoint {
+class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val replicaFactor: Int) extends RpcEndpoint {
 
   private val config = new Config(peers)
   private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
-  private lazy val vNodes = config.vNodeID2NodeInfo.filter(
+  private lazy val vNodes = config.vNodeID2NodeInfo.filter(//TODO add replica vnode
     vNodeIDNodeInfo => vNodeIDNodeInfo._2 == rpcEnv.address.hostPort
   ).map(vNodeIDNodeInfo => (vNodeIDNodeInfo._1 -> new VNode(vNodeIDNodeInfo._1)))
 
@@ -44,7 +44,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String]) extends
     case AttributeWrite(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          val targetVNodeIDNodeInfos = config.route(msg)
+          val targetVNodeIDNodeInfos = config.route(msg, replicaFactor)
           val (primaryVNodeID, primaryNodeInfo) = targetVNodeIDNodeInfos.head
           peerRpcs.get(primaryNodeInfo).get.addNodeWithRetry(msg, primaryVNodeID)
           targetVNodeIDNodeInfos.tail.par.foreach(vNodeIDNodeInfo => {
