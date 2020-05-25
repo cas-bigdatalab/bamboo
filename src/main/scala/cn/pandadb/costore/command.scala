@@ -37,7 +37,7 @@ private class StartNodeShellCommandExecutor extends ShellCommandExecutor {
 
   override def run(commandLine: CommandLine): Unit = {
     val address = commandLine.getOptionValue("ipPort")
-    val peers = commandLine.getOptionValue("ipPort").split(',').toList
+    val peers = commandLine.getOptionValue("peers").split(',').toList
     val replicaFactor = commandLine.getOptionValue("replicaFactor").toInt
     new NodeService(address, peers, replicaFactor).start()
   }
