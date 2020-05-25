@@ -8,6 +8,11 @@ class Config(val nodesInfo: List[String], val replicaFactor: Int) {
   def route(node: Map[String, String]): List[(Int, String)] = {
     val primaryVNodeID = vNodeRing.getHolder(node.get("id").get, replicaFactor).toInt
     val beginIndex = nodesInfo.indexOf(vNodeID2NodeInfo.get(primaryVNodeID).get)//TODO improve perf.
-    (0 until replicaFactor).toList.map(inc => (primaryVNodeID, nodesInfo((beginIndex+inc)%nodesInfo.length)))
+    println(beginIndex)
+    (0 until replicaFactor).toList.map(inc => {
+      val cur = (beginIndex+inc)%nodesInfo.length
+      println(cur)
+      (primaryVNodeID, nodesInfo(cur))
+    })
   }
 }
