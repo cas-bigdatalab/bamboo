@@ -1,6 +1,6 @@
 package cn.pandadb.costore
 import org.apache.commons.cli.{CommandLine, Option, Options}
-import utils.{CommandLauncher, ShellCommandExecutor}
+import cn.pandadb.costore.utils.{CommandLauncher, ShellCommandExecutor}
 
 object command extends CommandLauncher {
     override val commands: Array[(String, String, ShellCommandExecutor)] = Array[(String, String, ShellCommandExecutor)](

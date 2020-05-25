@@ -30,7 +30,7 @@ class NodeService(val address: String, val peers: List[String], val replicaFacto
 
 class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val replicaFactor: Int) extends RpcEndpoint {
 
-  private val config = new Config(peers)
+  private val config = new Config(peers, replicaFactor)
   private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
   private lazy val vNodes = config.vNodeID2NodeInfo.filter(//TODO add replica vnode
     vNodeIDNodeInfo => vNodeIDNodeInfo._2 == rpcEnv.address.hostPort
@@ -44,7 +44,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
     case AttributeWrite(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          val targetVNodeIDNodeInfos = config.route(msg, replicaFactor)
+          val targetVNodeIDNodeInfos = config.route(msg)
           val (primaryVNodeID, primaryNodeInfo) = targetVNodeIDNodeInfos.head
           peerRpcs.get(primaryNodeInfo).get.addNodeWithRetry(msg, primaryVNodeID)
           targetVNodeIDNodeInfos.tail.par.foreach(vNodeIDNodeInfo => {
