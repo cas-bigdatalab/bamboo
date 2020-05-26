@@ -33,7 +33,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
   private val config = new Config(peers, replicaFactor)
   private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
   private val replicaAddresses = config.getReplicaLocation(rpcEnv.address.hostPort)
-  private lazy val vNodes = config.vNodeID2NodeInfo.filter(//TODO add replica vnode
+  private lazy val vNodes = config.vNodeID2NodeInfo.filter(
     vNodeIDNodeInfo => replicaAddresses.indexOf(vNodeIDNodeInfo._2) != -1
   ).map(vNodeIDNodeInfo => (vNodeIDNodeInfo._1 -> new VNode(vNodeIDNodeInfo._1)))
 
