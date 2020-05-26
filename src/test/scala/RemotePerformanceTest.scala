@@ -21,7 +21,7 @@ class RemotePerformanceTest{
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNode(doc)
       })
-      Thread.sleep(5)
+      Thread.sleep(1)
     })
     val end = System.currentTimeMillis
     println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
@@ -34,8 +34,14 @@ class RemotePerformanceTest{
 
   @Test
   def search(): Unit ={
-    val ret = client.filterNodes(Map("name" -> "bluejoe_100"))
-    println(ret)
+    val itersOuter = 100
+    (1 to itersOuter).foreach(oid => {
+      val start = System.currentTimeMillis
+      val ret = client.filterNodes(Map("name" -> s"bluejoe_$oid"))
+      val end = System.currentTimeMillis
+      println(s"search results returned in ${end - start} ms")
+      println(ret)
+    })
   }
 
   @Test
