@@ -32,9 +32,8 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
 
   private val config = new Config(peers, replicaFactor)
   private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
-  private val replicaAddresses = config.getReplicaLocation(rpcEnv.address.hostPort)
-  private lazy val vNodes = config.vNodeID2NodeInfo.filter(
-    vNodeIDNodeInfo => replicaAddresses.indexOf(vNodeIDNodeInfo._2) != -1
+  private lazy val vNodes = config.vNodeID2NodeInfos.filter(
+    vNodeIDNodeInfos => vNodeIDNodeInfos._2.indexOf(rpcEnv.address.hostPort) != -1
   ).map(vNodeIDNodeInfo => (vNodeIDNodeInfo._1 -> new VNode(vNodeIDNodeInfo._1)))
 
   override def onStart(): Unit = {
@@ -59,12 +58,12 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
         }
       }
     }
-    case AttributeRead(msg, vNodeID) =>{//TODO: change read  from  main  replica  to choose replica
+    case AttributeRead(msg, vNodeID) =>{//TODO: change read  from failed main  replica  to choose replica
       vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()
-          config.vNodeID2NodeInfo.par.foreach(vNodeNode =>
-            ret.addAll(peerRpcs.get(vNodeNode._2).get.filterNodes(msg, vNodeNode._1))
+          config.vNodeID2NodeInfos.foreach(vNodeNodes =>
+            ret.addAll(peerRpcs.get(vNodeNodes._2.head).get.filterNodes(msg, vNodeNodes._1))
           )
           context.reply(ret)
         }
@@ -76,7 +75,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
     case AttributeDelete(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
-          config.route(msg).map(vNodeIDNodeInfo => {
+          config.route(msg).foreach(vNodeIDNodeInfo => {
             val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
             rpc.deleteNode(msg, vNodeIDNodeInfo._1)
           })
@@ -91,8 +90,10 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
     case AllDeleting(vNodeID) => {
       vNodeID match {
         case -1 => {
-          config.vNodeID2NodeInfo.foreach(vNodeNode =>
-            peerRpcs.get(vNodeNode._2).get.deleteAll(vNodeNode._1)
+          config.vNodeID2NodeInfos.foreach(vNodeNodes =>
+            vNodeNodes._2.foreach(node => {
+              peerRpcs.get(node).get.deleteAll(vNodeNodes._1)
+            })
           )
           context.reply(s"coordinator ${rpcEnv.address}: deleting all from all vNodes")
         }
