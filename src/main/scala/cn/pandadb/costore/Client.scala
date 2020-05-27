@@ -7,16 +7,25 @@ class Client(val addresses: List[String], val balancePolicy: String = "RR", val 
   val coordinators = addresses.map(a => new NodeRpc(a))
   private var coordinatorCur: Int = -1
   private val rnd = new scala.util.Random
-  private val requestCnt = 0
+  private var requestCnt: Int = 0
 
   def getCoordinator(): NodeRpc ={
-    coordinatorCur+=1
-    if (requestCnt%balancePolicyBatch == 0) {
+    if (requestCnt == 0) {
       coordinatorCur = balancePolicy match {
         case "FIRST" => 1
-        case "RR" => (coordinatorCur + 1) % addresses.length
+        case "RR" => {
+          var v = coordinatorCur + 1
+          if (v == addresses.length) {
+            v = 0
+          }
+          v
+        }
         case "RND" => rnd.nextInt(addresses.length)
       }
+    }
+    requestCnt += 1
+    if (requestCnt == balancePolicyBatch){
+      requestCnt = 0
     }
     coordinators(coordinatorCur)
   }

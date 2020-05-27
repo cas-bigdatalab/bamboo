@@ -7,7 +7,7 @@ class RemotePerformanceTest{
 
   @Test
   def buildIndex(): Unit ={
-    val  warmIters = 100//*1024
+    val  warmIters = 1000//*1024
     (1  to warmIters).foreach(id  =>  {
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
@@ -21,7 +21,7 @@ class RemotePerformanceTest{
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNode(doc)
       })
-      Thread.sleep(10)
+      Thread.sleep(5)
     })
     val end = System.currentTimeMillis
     println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
