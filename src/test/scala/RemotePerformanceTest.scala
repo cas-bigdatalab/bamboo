@@ -12,8 +12,8 @@ class RemotePerformanceTest{
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     client.deleteAll()
-    val itersOuter = 500//
-    val itersInner = 1000//
+    val itersOuter = 1000//
+    val itersInner = 100//
     val start = System.currentTimeMillis
     (1  to itersOuter).foreach(oid  =>  {
       (1  to itersInner).par.foreach(id  =>  {
