@@ -2,7 +2,7 @@ package cn.pandadb.costore
 
 import java.util
 
-class Client(val addresses: List[String], val balancePolicy: String = "FIRST", val balancePolicyBatch: Int = 100) { //TODO: hippo rpc
+class Client(val addresses: List[String], val balancePolicy: String = "RR", val balancePolicyBatch: Int = 100) { //TODO: hippo rpc
 
   val coordinators = addresses.map(a => new NodeRpc(a))
   private var coordinatorCur: Int = -1
