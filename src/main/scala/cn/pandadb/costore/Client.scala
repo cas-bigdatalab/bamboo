@@ -2,7 +2,7 @@ package cn.pandadb.costore
 
 import java.util
 
-class Client(val addresses: List[String], val balancePolicy: String = "RR") { //TODO: hippo rpc
+class Client(val addresses: List[String], val balancePolicy: String = "FIRST") { //TODO: hippo rpc
 
   val coordinators = addresses.map(a => new NodeRpc(a))
   private var coordinatorCur: Int = -1
@@ -10,6 +10,7 @@ class Client(val addresses: List[String], val balancePolicy: String = "RR") { //
 
   def getCoordinator(): NodeRpc ={
     coordinatorCur = balancePolicy match {
+      case "FIRST" => 1
       case "RR" => (coordinatorCur+1)%addresses.length
       case "RND" => rnd.nextInt(addresses.length)
     }

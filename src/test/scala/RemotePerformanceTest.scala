@@ -12,7 +12,7 @@ class RemotePerformanceTest{
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     client.deleteAll()
-    val itersOuter = 100//
+    val itersOuter = 500//
     val itersInner = 1000//
     val start = System.currentTimeMillis
     (1  to itersOuter).foreach(oid  =>  {
@@ -21,7 +21,7 @@ class RemotePerformanceTest{
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNode(doc)
       })
-      Thread.sleep(1)
+      Thread.sleep(10)
     })
     val end = System.currentTimeMillis
     println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
