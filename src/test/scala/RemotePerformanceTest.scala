@@ -1,36 +1,29 @@
 import cn.pandadb.costore.Client
-import org.junit.Test
+import org.junit.{After, Test}
 
 class RemotePerformanceTest{
 
-  val client = new Client(List("10.0.82.216:11234", "10.0.82.217:11234", "10.0.82.218:11234"))
+  val client = new Client(List("10.0.82.216:11234", "10.0.82.217:11234", "10.0.82.218:11234"), balancePolicy="RR", balancePolicyBatch = 15)
 
   @Test
   def buildIndex(): Unit ={
-    val  warmIters = 1000//*1024
-    (1  to warmIters).foreach(id  =>  {
-      client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
-    })
-    client.deleteAll()
-    val itersOuter = 1000//
-    val itersInner = 100//
-    val start = System.currentTimeMillis
-    (1  to itersOuter).foreach(oid  =>  {
+    val itersWarmer = 10
+    val itersOuter = 10000
+    val itersInner = 30
+    var start: Long = 0
+    (1  to itersOuter+itersWarmer).foreach(oid  =>  {
+      if (oid==itersWarmer+1){//skip warmer iters
+        start = System.currentTimeMillis
+      }
       (1  to itersInner).par.foreach(id  =>  {
         val pid = id+itersInner*(oid-1)
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNode(doc)
       })
-      Thread.sleep(5)
     })
     val end = System.currentTimeMillis
     println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
   }
-
-//  @After
-//  def clearIndex(): Unit ={
-//    client.deleteAll()
-//  }
 
   @Test
   def search(): Unit ={
