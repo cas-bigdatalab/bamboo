@@ -35,7 +35,11 @@ class Client(val addresses: List[String], val balancePolicy: String = "RR", val 
     getCoordinator.filterNodes(kv, -1)
   }
 
-  def addNode(docsToAdded: Map[String, String]): Unit = {
+  def addNodeSyn(docsToAdded: Map[String, String]): Unit = {
+    getCoordinator.addNodeWithRetry(docsToAdded, -1)
+  }
+
+  def addNodeAsyn(docsToAdded: Map[String, String]): Unit = {
     getCoordinator.addNode(docsToAdded, -1)
   }
 
