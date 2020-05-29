@@ -29,11 +29,13 @@ class PerformanceTest{
 
   @Test
   def writeIndex(): Unit ={
-    val vnode = new VNode(10000, )
-    val  iters = 50//*1024
-    vnode.write()
-    val ret = client.filterNodes(Map(("name" -> "bluejoe_1024")))
-    println(ret)
+    val vnode = new VNode(10000)
+    (1  to 50).foreach( id =>{
+      val start = System.currentTimeMillis
+      vnode.write(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
+      val end = System.currentTimeMillis
+      println(s"write one node to VNode cost " + (end-start) + " ms")
+    })
   }
 
   @Test
