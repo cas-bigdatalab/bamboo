@@ -25,7 +25,7 @@ class RemotePerformanceTest{
 //    client.deleteAll()
     val itersWarmer = 10
     val itersOuter = 1000
-    val itersInner = 30
+    val itersInner = 100
     var start: Long = 0
     (1  to itersOuter+itersWarmer).foreach(oid  =>  {
       if (oid==itersWarmer+1){//skip warmer iters
@@ -35,6 +35,7 @@ class RemotePerformanceTest{
         val pid = id+itersInner*(oid-1)
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNode(doc)
+        Thread.sleep(2)
       })
     })
     val end = System.currentTimeMillis

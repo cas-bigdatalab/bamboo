@@ -34,7 +34,7 @@ class NodeRpc(val address: String) {
       case scala.util.Success(value) => {}// println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
-    Await.result(future, Duration.apply("30s"))
+//    Await.result(future, Duration.apply("30s"))
   }
 
   def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: Int): Unit = {
