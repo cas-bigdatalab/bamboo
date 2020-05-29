@@ -1,4 +1,4 @@
-import cn.pandadb.costore.Client
+import cn.pandadb.costore.{Client, VNode}
 import org.junit.{After, Before, Test}
 
 class PerformanceTest{
@@ -23,6 +23,15 @@ class PerformanceTest{
 
   @Test
   def search(): Unit ={
+    val ret = client.filterNodes(Map(("name" -> "bluejoe_1024")))
+    println(ret)
+  }
+
+  @Test
+  def writeIndex(): Unit ={
+    val vnode = new VNode(10000, )
+    val  iters = 50//*1024
+    vnode.write()
     val ret = client.filterNodes(Map(("name" -> "bluejoe_1024")))
     println(ret)
   }

@@ -11,14 +11,17 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser
 import org.apache.lucene.search.{IndexSearcher, Query}
 import org.apache.lucene.store.FSDirectory
 
-class VNode(val id: Int) {
+class VNode(val id: Int, var flushInterval: Int = null) {
   private val dir = FSDirectory.open(Paths.get("data/vNode_"+id))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   val writer = new IndexWriter(dir, writerConfig)
+  if (flushInterval == null) {
+    flushInterval = globalConfig.flushInterval
+  }
 
   private val task = new java.util.TimerTask {def run() = writer.commit()}
-  new java.util.Timer().schedule(task, globalConfig.flushInterval, globalConfig.flushInterval)
+  new java.util.Timer().schedule(task, 0, flushInterval)
   task.run()
 
   val reader = DirectoryReader.open(dir)

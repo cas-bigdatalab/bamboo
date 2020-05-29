@@ -7,6 +7,22 @@ class RemotePerformanceTest{
 
   @Test
   def buildIndex(): Unit ={
+//    val time = 60000
+//    val stress = 1000
+//    val interval = 50
+//    val batch = stress/interval
+//    val start = System.currentTimeMillis
+//    (1  to time/interval).foreach(oid  =>  {
+//      (1  to batch).par.foreach(id  =>  {
+//        val pid = id+batch*(oid-1)
+//        val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
+//        client.addNode(doc)
+//      })
+//      Thread.sleep(interval)
+//    })
+//    val end = System.currentTimeMillis
+//    println(s"write ${time/interval*batch/(end-start).toFloat*1000} nodes per second to costore")
+//    client.deleteAll()
     val itersWarmer = 10
     val itersOuter = 1000
     val itersInner = 30
