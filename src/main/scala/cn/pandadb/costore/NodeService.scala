@@ -79,7 +79,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
       vNodeID match {
         case -1 => {
           val ret = new util.ArrayList[util.HashMap[String, String]]()
-          config.vNodeID2NodeInfos.foreach(vNodeNodes =>
+          config.vNodeID2NodeInfos.par.foreach(vNodeNodes =>
             ret.addAll(peerRpcs.get(vNodeNodes._2.head).get.filterNodes(msg, vNodeNodes._1))
           )
           context.reply(ret)

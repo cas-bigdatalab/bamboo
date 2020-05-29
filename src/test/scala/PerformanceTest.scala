@@ -10,7 +10,7 @@ class PerformanceTest{
     val  iters = 1024//*1024
     val start = System.currentTimeMillis
     (1  to iters).foreach(id  =>  {
-      client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
+      client.addNodeSyn(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     val end = System.currentTimeMillis
     println(s"write $iters nodes to costore cost " + (end-start) + " ms")
