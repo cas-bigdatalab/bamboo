@@ -3,12 +3,12 @@ import org.junit.{After, Test}
 
 class RemotePerformanceTest{
 
-  val client = new Client(List("10.0.82.216:11234", "10.0.82.217:11234", "10.0.82.218:11234"), balancePolicy="RR", balancePolicyBatch = 15)
+  val client = new Client(List("10.0.82.216:11234", "10.0.82.217:11234", "10.0.82.218:11234"), balancePolicy="RND", balancePolicyBatch = 30)
 
   @Test
   def buildIndex(): Unit ={
     val itersWarmer = 10
-    val itersOuter = 10000
+    val itersOuter = 1000
     val itersInner = 30
     var start: Long = 0
     (1  to itersOuter+itersWarmer).foreach(oid  =>  {
