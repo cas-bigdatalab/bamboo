@@ -3,7 +3,7 @@ package cn.pandadb.costore
 import java.util
 
 import cn.pandadb.costore.config.globalConfig
-import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
+import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWriteAsyn, AttributeWriteSyn}
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
@@ -29,7 +29,7 @@ class NodeRpc(val address: String) {
   }
 
   def addNode(docsToAdded: Map[String, String], vNodeID: Int = -1): Unit = {
-    val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
+    val future = endPointRef.ask[String](AttributeWriteAsyn(docsToAdded, vNodeID))
     future.onComplete {
       case scala.util.Success(value) => {}// println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
@@ -38,7 +38,7 @@ class NodeRpc(val address: String) {
   }
 
   def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: Int): Unit = {
-    endPointRef.askWithRetry[String](AttributeWrite(docsToAdded, vNodeID))
+    endPointRef.askWithRetry[String](AttributeWriteSyn(docsToAdded, vNodeID))
   }
 
   def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: Int = -1): Unit = {

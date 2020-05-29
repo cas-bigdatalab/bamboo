@@ -3,7 +3,7 @@ package cn.pandadb.costore
 import java.util
 
 import cn.pandadb.costore.config.Config
-import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
+import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWriteAsyn, AttributeWriteSyn}
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
@@ -41,12 +41,29 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
   }
 
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
-    case AttributeWrite(msg, vNodeID) => {
+    case AttributeWriteSyn(msg, vNodeID) => {
       vNodeID match {
         case -1 => {
           val targetVNodeIDNodeInfos = config.route(msg)
           val (primaryVNodeID, primaryNodeInfo) = targetVNodeIDNodeInfos.head
           peerRpcs.get(primaryNodeInfo).get.addNodeWithRetry(msg, primaryVNodeID)
+          targetVNodeIDNodeInfos.tail.par.foreach(vNodeIDNodeInfo => {
+            peerRpcs.get(vNodeIDNodeInfo._2).get.addNode(msg, vNodeIDNodeInfo._1)
+          })
+          context.reply(s"coordinator ${rpcEnv.address}: writing $msg")
+        }
+        case _ => {
+          vNodes.get(vNodeID).get.write(msg)
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg written")
+        }
+      }
+    }
+    case AttributeWriteAsyn(msg, vNodeID) => {
+      vNodeID match {
+        case -1 => {
+          val targetVNodeIDNodeInfos = config.route(msg)
+          val (primaryVNodeID, primaryNodeInfo) = targetVNodeIDNodeInfos.head
+          peerRpcs.get(primaryNodeInfo).get.addNode(msg, primaryVNodeID)
           targetVNodeIDNodeInfos.tail.par.foreach(vNodeIDNodeInfo => {
             peerRpcs.get(vNodeIDNodeInfo._2).get.addNode(msg, vNodeIDNodeInfo._1)
           })
