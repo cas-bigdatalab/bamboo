@@ -7,9 +7,9 @@ class ClientTest{
 
   @Before
   def buildIndex(): Unit ={
-    client.addNodeSyn(Map("id" -> "1", "name" -> "bluejoe", "url" -> "talent.com"))
-    client.addNodeSyn(Map("id" -> "2", "name" -> "excelwang", "url" -> "talent.com"))
-    client.addNodeSyn(Map("id" -> "3", "name" -> "zhongxin", "url" -> "talent.com"))
+    client.addNode(Map("id" -> "1", "name" -> "bluejoe", "url" -> "talent.com"))
+    client.addNode(Map("id" -> "2", "name" -> "excelwang", "url" -> "talent.com"))
+    client.addNode(Map("id" -> "3", "name" -> "zhongxin", "url" -> "talent.com"))
   }
 
   @After

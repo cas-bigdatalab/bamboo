@@ -6,7 +6,7 @@ class RemotePerformanceTest{
   val client = new Client(List("10.0.82.216:11234", "10.0.82.217:11234", "10.0.82.218:11234"), balancePolicy="RND", balancePolicyBatch = 30)
 
   @Test
-  def buildIndexAsync(): Unit ={
+  def buildIndex(): Unit ={
     val itersWarmer = 10
     val itersOuter = 500
     val itersInner = 50
@@ -18,8 +18,7 @@ class RemotePerformanceTest{
       (1  to itersInner).par.foreach(id  =>  {
         val pid = id+itersInner*(oid-1)
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
-        client.addNodeAsyn(doc)
-        Thread.sleep(30)
+        client.addNode(doc)
       })
     })
     val end = System.currentTimeMillis
@@ -27,7 +26,7 @@ class RemotePerformanceTest{
   }
 
   @Test
-  def buildIndexSync(): Unit ={
+  def buildIndexAsync(): Unit ={
     val itersWarmer = 10
     val itersOuter = 1000
     val itersInner = 100
@@ -39,8 +38,8 @@ class RemotePerformanceTest{
       (1  to itersInner).par.foreach(id  =>  {
         val pid = id+itersInner*(oid-1)
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
-        client.addNodeSyn(doc)
-        Thread.sleep(2)
+        client.addNodeAsyn(doc)
+        Thread.sleep(200)
       })
     })
     val end = System.currentTimeMillis

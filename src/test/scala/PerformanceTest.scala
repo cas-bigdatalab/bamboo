@@ -9,8 +9,8 @@ class PerformanceTest{
   def buildIndex(): Unit ={
     val  iters = 1024
     val start = System.currentTimeMillis
-    (1  to iters).foreach(id  =>  {
-      client.addNodeAsyn(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
+    (1  to iters).par.foreach(id  =>  {
+      client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     val end = System.currentTimeMillis
     println(s"write $iters nodes to costore cost " + (end-start) + " ms")

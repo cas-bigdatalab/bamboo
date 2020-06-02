@@ -3,12 +3,12 @@ package cn.pandadb.costore
 import java.util
 
 import cn.pandadb.costore.config.globalConfig
-import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWriteAsyn, AttributeWriteSyn}
+import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
@@ -28,17 +28,17 @@ class NodeRpc(val address: String) {
     endPointRef.askWithRetry[util.ArrayList[util.HashMap[String, String]]](AttributeRead(kv, vNodeID))
   }
 
-  def addNode(docsToAdded: Map[String, String], vNodeID: String = "-1"): Unit = {
-    val future = endPointRef.ask[String](AttributeWriteAsyn(docsToAdded, vNodeID))
+  def addNodeAsyn(docsToAdded: Map[String, String], vNodeID: String = "-1"): Future[String] = {
+    val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => {}// println(s"$value")
+      case scala.util.Success(value) => {} // println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
-    Await.result(future, Duration.apply("30s"))
+    future
   }
 
-  def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: String): Unit = {
-    endPointRef.askWithRetry[String](AttributeWriteSyn(docsToAdded, vNodeID))
+  def addNode(docsToAdded: Map[String, String], vNodeID: String): Unit = {
+    endPointRef.askWithRetry[String](AttributeWrite(docsToAdded, vNodeID))
   }
 
   def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: String = "-1"): Unit = {

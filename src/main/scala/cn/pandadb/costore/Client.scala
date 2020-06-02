@@ -2,6 +2,8 @@ package cn.pandadb.costore
 
 import java.util
 
+import scala.concurrent.Future
+
 class Client(val addresses: List[String], val balancePolicy: String = "RR", val balancePolicyBatch: Int = 100) { //TODO: hippo rpc
 
   val coordinators = addresses.map(a => new NodeRpc(a))
@@ -35,11 +37,11 @@ class Client(val addresses: List[String], val balancePolicy: String = "RR", val 
     getCoordinator.filterNodes(kv, "-1")
   }
 
-  def addNodeSyn(docsToAdded: Map[String, String]): Unit = {
-    getCoordinator.addNodeWithRetry(docsToAdded, "-1")
+  def addNodeAsyn(docsToAdded: Map[String, String]): Future[String] = {
+    getCoordinator.addNodeAsyn(docsToAdded, "-1")
   }
 
-  def addNodeAsyn(docsToAdded: Map[String, String]): Unit = {
+  def addNode(docsToAdded: Map[String, String]): Unit = {
     getCoordinator.addNode(docsToAdded, "-1")
   }
 
