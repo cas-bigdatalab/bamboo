@@ -11,8 +11,8 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser
 import org.apache.lucene.search.{IndexSearcher, Query}
 import org.apache.lucene.store.FSDirectory
 
-class VNode(val id: Int, var flushInterval: Int = -1) {
-  private val dir = FSDirectory.open(Paths.get("data/vNode_"+id))
+class VNode(val id: String, var flushInterval: Int = -1) {
+  private val dir = FSDirectory.open(Paths.get(s"data/vNode_$id"))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
   writerConfig.setRAMBufferSizeMB(1024)

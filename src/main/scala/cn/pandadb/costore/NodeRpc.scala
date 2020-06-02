@@ -24,24 +24,24 @@ class NodeRpc(val address: String) {
       "node-service"
     )
 
-  def filterNodes(kv: Map[String, String], vNodeID: Int = -1): util.ArrayList[util.HashMap[String, String]]  = {
+  def filterNodes(kv: Map[String, String], vNodeID: String = "-1"): util.ArrayList[util.HashMap[String, String]]  = {
     endPointRef.askWithRetry[util.ArrayList[util.HashMap[String, String]]](AttributeRead(kv, vNodeID))
   }
 
-  def addNode(docsToAdded: Map[String, String], vNodeID: Int = -1): Unit = {
+  def addNode(docsToAdded: Map[String, String], vNodeID: String = "-1"): Unit = {
     val future = endPointRef.ask[String](AttributeWriteAsyn(docsToAdded, vNodeID))
     future.onComplete {
       case scala.util.Success(value) => {}// println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
-//    Await.result(future, Duration.apply("30s"))
+    Await.result(future, Duration.apply("30s"))
   }
 
-  def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: Int): Unit = {
+  def addNodeWithRetry(docsToAdded: Map[String, String], vNodeID: String): Unit = {
     endPointRef.askWithRetry[String](AttributeWriteSyn(docsToAdded, vNodeID))
   }
 
-  def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: Int = -1): Unit = {
+  def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: String = "-1"): Unit = {
     val future = endPointRef.ask[String](AttributeDelete(docsToBeDeleted, vNodeID))
     future.onComplete {
       case scala.util.Success(value) => println(s"$value")
@@ -50,7 +50,7 @@ class NodeRpc(val address: String) {
     Await.result(future, Duration.apply("30s"))
   }
 
-  def deleteAll(vNodeID: Int = -1): Unit = {
+  def deleteAll(vNodeID: String = "-1"): Unit = {
     val future = endPointRef.ask[String](AllDeleting(vNodeID))
     future.onComplete {
       case scala.util.Success(value) => println(s"$value")

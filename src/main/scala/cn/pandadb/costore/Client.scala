@@ -32,22 +32,22 @@ class Client(val addresses: List[String], val balancePolicy: String = "RR", val 
 
   def filterNodes(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]]  = {
     println(s"search $kv:")
-    getCoordinator.filterNodes(kv, -1)
+    getCoordinator.filterNodes(kv, "-1")
   }
 
   def addNodeSyn(docsToAdded: Map[String, String]): Unit = {
-    getCoordinator.addNodeWithRetry(docsToAdded, -1)
+    getCoordinator.addNodeWithRetry(docsToAdded, "-1")
   }
 
   def addNodeAsyn(docsToAdded: Map[String, String]): Unit = {
-    getCoordinator.addNode(docsToAdded, -1)
+    getCoordinator.addNode(docsToAdded, "-1")
   }
 
   def deleteNode(docsToBeDeleted: Map[String, String]): Unit = {
-    getCoordinator.deleteNode(docsToBeDeleted, -1)
+    getCoordinator.deleteNode(docsToBeDeleted, "-1")
   }
 
   def deleteAll(): Unit = {
-    getCoordinator.deleteAll(-1)
+    getCoordinator.deleteAll("-1")
   }
 }

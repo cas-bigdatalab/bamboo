@@ -5,12 +5,12 @@ class PerformanceTest{
 
   val client = new Client(List("localhost:11234"))
 
-  @Test
+  @Before
   def buildIndex(): Unit ={
-    val  iters = 1024//*1024
+    val  iters = 1024
     val start = System.currentTimeMillis
     (1  to iters).foreach(id  =>  {
-      client.addNodeSyn(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
+      client.addNodeAsyn(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     val end = System.currentTimeMillis
     println(s"write $iters nodes to costore cost " + (end-start) + " ms")
@@ -23,13 +23,14 @@ class PerformanceTest{
 
   @Test
   def search(): Unit ={
+    Thread.sleep(20000)
     val ret = client.filterNodes(Map(("name" -> "bluejoe_1024")))
     println(ret)
   }
 
   @Test
   def writeIndex(): Unit ={
-    val vnode = new VNode(10000)
+    val vnode = new VNode("10000")
     (1  to 50).foreach( id =>{
       val start = System.currentTimeMillis
       vnode.write(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
