@@ -7,9 +7,10 @@ class RemotePerformanceTest{
 
   @Test
   def buildIndex(): Unit ={
+    client.deleteAll()
     val itersWarmer = 10
     val itersOuter = 500
-    val itersInner = 50
+    val itersInner = 100
     var start: Long = 0
     (1  to itersOuter+itersWarmer).foreach(oid  =>  {
       if (oid==itersWarmer+1){//skip warmer iters
@@ -39,7 +40,6 @@ class RemotePerformanceTest{
         val pid = id+itersInner*(oid-1)
         val doc = Map("id" -> s"$pid", "name" -> s"bluejoe_$pid", "url" -> s"talent.com_$pid")
         client.addNodeAsyn(doc)
-        Thread.sleep(200)
       })
     })
     val end = System.currentTimeMillis
@@ -48,10 +48,10 @@ class RemotePerformanceTest{
 
   @Test
   def search(): Unit ={
-    val itersOuter = 100
+    val itersOuter = 10
     (1 to itersOuter).foreach(oid => {
       val start = System.currentTimeMillis
-      val ret = client.filterNodes(Map("name" -> s"bluejoe_$oid"))
+      val ret = client.filterNodes(Map("name" -> s"bluejoe_${oid*10000}"))
       val end = System.currentTimeMillis
       println(s"search results returned in ${end - start} ms")
       println(ret)

@@ -44,7 +44,7 @@ class VNode(val id: String, var flushInterval: Int = -1) {
 
   def write(kv: Map[String, String]): Unit ={
     writer.addDocument(createDocument(kv))
-    writer.commit()
+//    writer.commit()
   }
 
   def search(kv: Map[String, String]): util.ArrayList[util.HashMap[String, String]] = {
