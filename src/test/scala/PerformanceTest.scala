@@ -1,4 +1,4 @@
-import cn.pandadb.costore.{Client, VNode}
+import cn.pandadb.bamboo.{Client, VNode}
 import org.junit.{After, Before, Test}
 
 class PerformanceTest{
@@ -13,7 +13,7 @@ class PerformanceTest{
       client.addNode(Map("id" -> s"$id", "name" -> s"bluejoe_$id", "url" -> s"talent.com_$id"))
     })
     val end = System.currentTimeMillis
-    println(s"write $iters nodes to costore cost " + (end-start) + " ms")
+    println(s"write $iters nodes to bamboo cost " + (end-start) + " ms")
   }
 
 //  @After

@@ -1,4 +1,4 @@
-package cn.pandadb.costore.config
+package cn.pandadb.bamboo.config
 
 object globalConfig {
   //  lazy val props = new Properties()

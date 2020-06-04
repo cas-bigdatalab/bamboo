@@ -1,13 +1,13 @@
-package cn.pandadb.costore
+package cn.pandadb.bamboo
 import org.apache.commons.cli.{CommandLine, Option, Options}
-import cn.pandadb.costore.utils.{CommandLauncher, ShellCommandExecutor}
+import cn.pandadb.bamboo.utils.{CommandLauncher, ShellCommandExecutor}
 
 object command extends CommandLauncher {
     override val commands: Array[(String, String, ShellCommandExecutor)] = Array[(String, String, ShellCommandExecutor)](
       ("start", "start node server using a conf file", new StartNodeShellCommandExecutor()),
       ("help", "print usage information", null)
   )
-  override val launcherName: String = "costore"
+  override val launcherName: String = "bamboo"
 }
 
 private class StartNodeShellCommandExecutor extends ShellCommandExecutor {

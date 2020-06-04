@@ -1,4 +1,4 @@
-import cn.pandadb.costore.Client
+import cn.pandadb.bamboo.Client
 import org.junit.{After, Before, Test}
 
 class ClientTest{

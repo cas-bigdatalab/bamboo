@@ -1,4 +1,4 @@
-import cn.pandadb.costore.NodeService
+import cn.pandadb.bamboo.NodeService
 import org.junit.{After, Test}
 
 class ServiceTest{

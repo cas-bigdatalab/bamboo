@@ -1,9 +1,9 @@
-package cn.pandadb.costore
+package cn.pandadb.bamboo
 
 import java.nio.file.Paths
 import java.util
 
-import cn.pandadb.costore.config.globalConfig
+import cn.pandadb.bamboo.config.globalConfig
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.document.{Document, Field, TextField}
 import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}

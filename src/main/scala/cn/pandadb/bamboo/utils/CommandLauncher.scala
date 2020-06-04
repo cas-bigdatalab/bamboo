@@ -1,4 +1,4 @@
-package cn.pandadb.costore.utils
+package cn.pandadb.bamboo.utils
 
 /**
  * Created by bluejoe on 2020/3/25.

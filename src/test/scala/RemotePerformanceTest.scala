@@ -1,4 +1,4 @@
-import cn.pandadb.costore.Client
+import cn.pandadb.bamboo.Client
 import org.junit.{After, Test}
 
 class RemotePerformanceTest{
@@ -9,7 +9,7 @@ class RemotePerformanceTest{
   def buildIndex(): Unit ={
     client.deleteAll()
     val itersWarmer = 10
-    val itersOuter = 500
+    val itersOuter =1000
     val itersInner = 100
     var start: Long = 0
     (1  to itersOuter+itersWarmer).foreach(oid  =>  {
@@ -23,14 +23,14 @@ class RemotePerformanceTest{
       })
     })
     val end = System.currentTimeMillis
-    println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
+    println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to bamboo")
   }
 
   @Test
   def buildIndexAsync(): Unit ={
     val itersWarmer = 10
     val itersOuter = 1000
-    val itersInner = 100
+    val itersInner = 200
     var start: Long = 0
     (1  to itersOuter+itersWarmer).foreach(oid  =>  {
       if (oid==itersWarmer+1){//skip warmer iters
@@ -43,7 +43,7 @@ class RemotePerformanceTest{
       })
     })
     val end = System.currentTimeMillis
-    println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to costore")
+    println(s"write ${itersOuter*itersInner/(end-start).toFloat*1000} nodes per second to bamboo")
   }
 
   @Test

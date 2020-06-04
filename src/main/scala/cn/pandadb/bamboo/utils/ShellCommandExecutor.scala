@@ -1,4 +1,4 @@
-package cn.pandadb.costore.utils
+package cn.pandadb.bamboo.utils
 
 import org.apache.commons.cli.{CommandLine, DefaultParser, HelpFormatter, Options, ParseException}
 

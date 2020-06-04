@@ -1,6 +1,6 @@
-package cn.pandadb.costore.config
+package cn.pandadb.bamboo.config
 
-import cn.pandadb.costore.utils.ConsistentHashRing
+import cn.pandadb.bamboo.utils.ConsistentHashRing
 
 import scala.collection.mutable
 

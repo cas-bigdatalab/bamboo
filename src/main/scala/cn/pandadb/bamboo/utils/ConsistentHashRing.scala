@@ -1,4 +1,4 @@
-package cn.pandadb.costore.utils
+package cn.pandadb.bamboo.utils
 
 import scala.collection.immutable.TreeMap
 import util.hashing.MurmurHash3.stringHash

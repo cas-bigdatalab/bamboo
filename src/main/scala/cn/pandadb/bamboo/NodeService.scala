@@ -1,9 +1,9 @@
-package cn.pandadb.costore
+package cn.pandadb.bamboo
 
 import java.util
 
-import cn.pandadb.costore.config.Config
-import cn.pandadb.costore.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
+import cn.pandadb.bamboo.config.Config
+import cn.pandadb.bamboo.msg.{AllDeleting, AttributeDelete, AttributeRead, AttributeWrite}
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc._
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
