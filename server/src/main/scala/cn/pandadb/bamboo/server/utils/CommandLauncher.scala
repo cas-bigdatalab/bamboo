@@ -3,6 +3,8 @@ package cn.pandadb.bamboo.server.utils
 /**
  * Created by bluejoe on 2020/3/25.
  */
+
+// scalastyle:off
 trait CommandLauncher {
   val commands: Array[(String, String, ShellCommandExecutor)]
   val launcherName: String
@@ -56,3 +58,4 @@ trait CommandLauncher {
     }
   }
 }
+// scalastyle:on

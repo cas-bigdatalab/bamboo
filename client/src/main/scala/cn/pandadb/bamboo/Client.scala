@@ -1,11 +1,5 @@
 package cn.pandadb.bamboo
 
-import java.util
-
-import cn.pandadb.bamboo.rpc.NodeRpc
-
-import scala.concurrent.Future
-
 class Client(val addresses: List[String], val balancePolicy: String = "RR", val balancePolicyBatch: Int = 100) {
 
   val coordinators = addresses.map(a => new NodeRpc(a))

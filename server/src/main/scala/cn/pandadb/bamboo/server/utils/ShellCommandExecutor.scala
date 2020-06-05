@@ -4,6 +4,7 @@ import org.apache.commons.cli.{CommandLine, DefaultParser, HelpFormatter, Option
 
 import scala.collection.mutable.ArrayBuffer
 
+// scalastyle:off
 trait ShellCommandExecutor {
   val commandNamePath = ArrayBuffer[String]()
 
@@ -41,4 +42,5 @@ trait ShellCommandExecutor {
     formatter.printHelp(s"${commandNamePath.mkString(" ")}", OPTIONS, true)
     System.out.println()
   }
+  // scalastyle:on
 }

@@ -15,7 +15,7 @@ class NodeRpc(val address: String) {
   val ip = ipPort(0)
   val port = ipPort(1).toInt
   private lazy val endPointRef = NettyRpcEnvFactory.create(
-      RpcEnvClientConfig( new RpcConf(), "node-client")
+      RpcEnvClientConfig(new RpcConf(), "node-client")
     ).setupEndpointRef(
       new RpcAddress(ip, port),
       "node-service"
