@@ -31,7 +31,7 @@ trait ShellCommandExecutor {
     catch {
       case e: ParseException =>
         println(e.getMessage())
-        printUsage();
+        printUsage()
     }
   }
 

@@ -1,6 +1,6 @@
 
 import cn.pandadb.bamboo.Client
-import org.junit.{After, Before, Test}
+import org.junit.{Before, Test}
 
 class PerformanceTest{
 

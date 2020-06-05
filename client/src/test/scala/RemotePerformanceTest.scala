@@ -1,6 +1,6 @@
 
 import cn.pandadb.bamboo.Client
-import org.junit.{After, Test}
+import org.junit.Test
 
 class RemotePerformanceTest{
 
