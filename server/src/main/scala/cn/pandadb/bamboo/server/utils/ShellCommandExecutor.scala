@@ -4,8 +4,8 @@ import org.apache.commons.cli.{CommandLine, DefaultParser, HelpFormatter, Option
 
 import scala.collection.mutable.ArrayBuffer
 
-// scalastyle:off
 trait ShellCommandExecutor {
+  // scalastyle:off
   val commandNamePath = ArrayBuffer[String]()
 
   def init(cmds: Array[String]): this.type = {

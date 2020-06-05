@@ -5,7 +5,7 @@ import cn.pandadb.bamboo.server.utils.ConsistentHashRing
 import scala.collection.mutable
 
 class Config(val nodesInfo: List[String], val replicaFactor: Int) {
-  val vNodeIDs = 0 until nodesInfo.length * globalConfig.vNodeNumberPerNode toList
+  val vNodeIDs = 0 until nodesInfo.length * GlobalConfig.vNodeNumberPerNode toList
   lazy val vNodeID2NodeInfos = vNodeIDs.map(vid => (vid -> {
     val beginIndex = vid % nodesInfo.length
     (0 until replicaFactor).toList.map(inc => (s"${vid}_replica_$inc", nodesInfo((beginIndex + inc) % nodesInfo.length)))

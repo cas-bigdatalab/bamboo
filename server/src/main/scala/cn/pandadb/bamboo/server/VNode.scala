@@ -2,7 +2,7 @@ package cn.pandadb.bamboo.server
 
 import java.nio.file.Paths
 
-import cn.pandadb.bamboo.server.config.globalConfig
+import cn.pandadb.bamboo.server.config.GlobalConfig
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.document.{Document, Field, TextField}
 import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}
@@ -20,7 +20,7 @@ class VNode(val id: String, var flushInterval: Int = -1) {
   writerConfig.setMaxBufferedDocs(10240)
   val writer = new IndexWriter(dir, writerConfig)
   if (flushInterval == -1) {
-    flushInterval = globalConfig.flushInterval
+    flushInterval = GlobalConfig.flushInterval
   }
 
   private val task = new java.util.TimerTask {def run() = writer.commit()}
