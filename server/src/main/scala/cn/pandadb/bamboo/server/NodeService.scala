@@ -57,42 +57,42 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
         case _ =>
           vNodes.get(s"$vNodeID").get.write(msg)
           context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg written")
-        case AttributeRead(msg, vNodeID) => //TODO: change read  from failed main  replica  to choose replica
-          vNodeID match {
-            case "-1" =>
-              val ret = mutable.ListBuffer[Map[String, String]]()
-              config.vNodeID2NodeInfos.par.foreach(vNodeNodes =>
-                ret ++ (peerRpcs.get(vNodeNodes._2.head._2).get.filterNodes(msg, vNodeNodes._2.head._1))
-              )
-              context.reply(ret.toList)
-            case _ =>
-              context.reply(vNodes.get(vNodeID).get.search(msg))
-          }
-        case AttributeDelete(msg, vNodeID) =>
-          vNodeID match {
-            case "-1" =>
-              config.route(msg).foreach(vNodeIDNodeInfo => {
-                val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
-                rpc.deleteNode(msg, vNodeIDNodeInfo._1)
-              })
-              context.reply(s"coordinator ${rpcEnv.address}: deleting $msg")
-            case _ =>
-              vNodes.get(vNodeID).get.delete(msg)
-              context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg deleted")
-          }
-        case AllDeleting(vNodeID) =>
-          vNodeID match {
-            case "-1" =>
-              config.vNodeID2NodeInfos.foreach(vNodeNodes =>
-                vNodeNodes._2.foreach(node => {
-                  peerRpcs.get(node._2).get.deleteAll(node._1)
-                })
-              )
-              context.reply(s"coordinator ${rpcEnv.address}: deleting all from all vNodes")
-            case _ =>
-              vNodes.get(vNodeID).get.deleteAll()
-              context.reply(s"vNode $vNodeID on ${rpcEnv.address}: all deleted")
-          }
+      }
+    case AttributeRead(msg, vNodeID) => //TODO: change read  from failed main  replica  to choose replica
+      vNodeID match {
+        case "-1" =>
+          val ret = mutable.ListBuffer[Map[String, String]]()
+          config.vNodeID2NodeInfos.par.foreach(vNodeNodes =>
+            ret ++ (peerRpcs.get(vNodeNodes._2.head._2).get.filterNodes(msg, vNodeNodes._2.head._1))
+          )
+          context.reply(ret.toList)
+        case _ =>
+          context.reply(vNodes.get(vNodeID).get.search(msg))
+      }
+    case AttributeDelete(msg, vNodeID) =>
+      vNodeID match {
+        case "-1" =>
+          config.route(msg).foreach(vNodeIDNodeInfo => {
+            val rpc = peerRpcs.get(vNodeIDNodeInfo._2).get
+            rpc.deleteNode(msg, vNodeIDNodeInfo._1)
+          })
+          context.reply(s"coordinator ${rpcEnv.address}: deleting $msg")
+        case _ =>
+          vNodes.get(vNodeID).get.delete(msg)
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: $msg deleted")
+      }
+    case AllDeleting(vNodeID) =>
+      vNodeID match {
+        case "-1" =>
+          config.vNodeID2NodeInfos.foreach(vNodeNodes =>
+            vNodeNodes._2.foreach(node => {
+              peerRpcs.get(node._2).get.deleteAll(node._1)
+            })
+          )
+          context.reply(s"coordinator ${rpcEnv.address}: deleting all from all vNodes")
+        case _ =>
+          vNodes.get(vNodeID).get.deleteAll()
+          context.reply(s"vNode $vNodeID on ${rpcEnv.address}: all deleted")
       }
   }
 
