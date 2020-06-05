@@ -1,7 +1,6 @@
 package cn.pandadb.bamboo.server
 
 import java.nio.file.Paths
-import java.util
 
 import cn.pandadb.bamboo.server.config.globalConfig
 import org.apache.lucene.analysis.standard.StandardAnalyzer
@@ -44,14 +43,14 @@ class VNode(val id: String, var flushInterval: Int = -1) {
       parse(kv.values.toArray.mkString(" and "))
   }
 
-  def write(kv: Map[String, String]): Unit ={
+  def write(kv: Map[String, String]): Unit = {
     writer.addDocument(createDocument(kv))
 //    writer.commit()
   }
 
   def search(kv: Map[String, String]): List[Map[String, String]] = {
     val docs = mutable.ListBuffer[Map[String, String]]()
-    val hits = searcher.search(buildQuery(kv),10000)//TODO allow all results
+    val hits = searcher.search(buildQuery(kv), 10000) //TODO allow all results
     hits.scoreDocs.map(d => {
       val doc = new mutable.HashMap[String, String]()
       val itl = searcher.doc(d.doc).getFields().iterator()

@@ -3,10 +3,10 @@ package cn.pandadb.bamboo.server
 import cn.pandadb.bamboo.server.utils.{CommandLauncher, ShellCommandExecutor}
 import org.apache.commons.cli.{CommandLine, Option, Options}
 
-object command extends CommandLauncher {
-    override val commands: Array[(String, String, ShellCommandExecutor)] = Array[(String, String, ShellCommandExecutor)](
-      ("start", "start node server using a conf file", new StartNodeShellCommandExecutor()),
-      ("help", "print usage information", null)
+object Command extends CommandLauncher {
+  override val commands: Array[(String, String, ShellCommandExecutor)] = Array[(String, String, ShellCommandExecutor)] (
+    ("start", "start node server using a conf file", new StartNodeShellCommandExecutor()),
+    ("help", "print usage information", null)
   )
   override val launcherName: String = "bamboo"
 }

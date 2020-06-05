@@ -8,7 +8,7 @@ class ConsistentHashRing(val identities: List[String]) {
 
   def getHolder(beHeldID: String): String = {
     var itr = ring.iteratorFrom(stringHash(beHeldID))
-    itr = if(itr.hasNext) itr else ring.iterator
+    itr = if (itr.hasNext) itr else ring.iterator
     itr.next()._2
   }
 

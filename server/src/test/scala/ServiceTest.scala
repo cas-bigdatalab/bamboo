@@ -8,12 +8,12 @@ class ServiceTest{
   val services = nodesInfo.map(n => new NodeService(n, nodesInfo, 3))
 
   @Test
-  def start(): Unit ={
+  def start(): Unit = {
     services.par.foreach(s => s.start())
   }
 
   @After
-  def stop(): Unit ={
+  def stop(): Unit = {
     services.par.foreach(s => s.stop())
   }
 

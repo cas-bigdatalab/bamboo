@@ -1,7 +1,5 @@
 package cn.pandadb.bamboo.rpc
 
-import java.util
-
 import cn.pandadb.bamboo.rpc.msg._
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc.{RpcAddress, RpcEnvClientConfig}
@@ -23,19 +21,18 @@ class NodeRpc(val address: String) {
       "node-service"
     )
 
-  def filterNodes(kv: Map[String, String], vNodeID: String = "-1"): List[Map[String, String]]  = {
+  def filterNodes(kv: Map[String, String], vNodeID: String = "-1"): List[Map[String, String]] = {
     endPointRef.askWithRetry[List[Map[String, String]]](AttributeRead(kv, vNodeID))
   }
-
+  // scalastyle:off
   def addNodeAsyn(docsToAdded: Map[String, String], vNodeID: String = "-1"): Future[String] = {
     val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => {} // println(s"$value")
+      case scala.util.Success(value) => { } // println(s"$value")
       case scala.util.Failure(e) => println(s"Got error: $e")
     }
     future
   }
-
   def addNode(docsToAdded: Map[String, String], vNodeID: String): Unit = {
     endPointRef.askWithRetry[String](AttributeWrite(docsToAdded, vNodeID))
   }
@@ -57,4 +54,5 @@ class NodeRpc(val address: String) {
     }
     Await.result(future, Duration.apply("30s"))
   }
+  // scalastyle:on
 }
