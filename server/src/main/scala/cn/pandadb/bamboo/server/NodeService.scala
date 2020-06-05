@@ -63,7 +63,7 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
         case "-1" =>
           val ret = mutable.ListBuffer[Map[String, String]]()
           config.vNodeID2NodeInfos.par.foreach(vNodeNodes =>
-            ret ++ (peerRpcs.get(vNodeNodes._2.head._2).get.filterNodes(msg, vNodeNodes._2.head._1))
+            ret ++= (peerRpcs.get(vNodeNodes._2.head._2).get.filterNodes(msg, vNodeNodes._2.head._1))
           )
           context.reply(ret.toList)
         case _ =>
