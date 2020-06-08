@@ -16,8 +16,8 @@ class VNode(val id: String, var flushInterval: Int = -1) {
   private val dir = FSDirectory.open(Paths.get(s"data/vNode_$id"))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
-  writerConfig.setRAMBufferSizeMB(1024)
-  writerConfig.setMaxBufferedDocs(10240)
+//  writerConfig.setRAMBufferSizeMB(1024)
+//  writerConfig.setMaxBufferedDocs(10240)
   val writer = new IndexWriter(dir, writerConfig)
   if (flushInterval == -1) {
     flushInterval = GlobalConfig.flushInterval
