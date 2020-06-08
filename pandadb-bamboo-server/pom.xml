@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>server</artifactId>
+    <artifactId>pandadb-bamboo-server</artifactId>
     <properties>
         <lucene.version>8.5.0</lucene.version>
     </properties>

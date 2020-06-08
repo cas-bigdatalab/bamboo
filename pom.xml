@@ -9,8 +9,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>server</module>
-        <module>rpc</module>
-        <module>client</module>
+        <module>pandadb-bamboo-rpc</module>
+        <module>pandadb-bamboo-client</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
