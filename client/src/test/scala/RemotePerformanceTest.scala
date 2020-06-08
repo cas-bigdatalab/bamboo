@@ -11,8 +11,8 @@ class RemotePerformanceTest{
   def buildIndex(): Unit = {
     client.deleteAll()
     val itersWarmer = 10
-    val itersOuter = 100
-    val itersInner = 10
+    val itersOuter = 200
+    val itersInner = 100
     var start: Long = 0
     (1  to itersOuter + itersWarmer).foreach(oid => {
       if (oid == itersWarmer + 1) {//skip warmer iters
