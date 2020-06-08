@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>server</module>
+        <module>pandadb-bamboo-server</module>
         <module>pandadb-bamboo-rpc</module>
         <module>pandadb-bamboo-client</module>
     </modules>
