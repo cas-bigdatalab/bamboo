@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>pandadb-bamboo-server</artifactId>
+    <artifactId>bamboo-server</artifactId>
     <properties>
         <lucene.version>8.5.0</lucene.version>
     </properties>
@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>cn.pandadb.bamboo</groupId>
-            <artifactId>rpc</artifactId>
+            <artifactId>bamboo-rpc</artifactId>
             <version>${pandadb.bamboo.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -8,9 +8,9 @@
     <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>pandadb-bamboo-server</module>
-        <module>pandadb-bamboo-rpc</module>
-        <module>pandadb-bamboo-client</module>
+        <module>bamboo-server</module>
+        <module>bamboo-rpc</module>
+        <module>bamboo-client</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
