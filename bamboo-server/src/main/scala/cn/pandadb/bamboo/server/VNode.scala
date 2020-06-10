@@ -50,6 +50,7 @@ class VNode(val id: String, var flushInterval: Int = -1) {
 
   def search(kv: Map[String, String]): List[Map[String, String]] = {
     val docs = mutable.ListBuffer[Map[String, String]]()
+    val searcher = new IndexSearcher(DirectoryReader.open(dir))
     val hits = searcher.search(buildQuery(kv), 10000) //TODO allow all results
     hits.scoreDocs.map(d => {
       val doc = new mutable.HashMap[String, String]()
