@@ -12,23 +12,32 @@ import org.apache.lucene.store.FSDirectory
 
 import scala.collection.mutable
 
-class VNode(val id: String, var flushInterval: Int = -1) {
+class VNode(val id: String, var commitInterval: Int = -1) {
   private val dir = FSDirectory.open(Paths.get(s"data/vNode_$id"))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
-//  writerConfig.setRAMBufferSizeMB(1024)
-//  writerConfig.setMaxBufferedDocs(10240)
+  writerConfig.setRAMBufferSizeMB(1024)
+  writerConfig.setMaxBufferedDocs(10240)
   val writer = new IndexWriter(dir, writerConfig)
-  if (flushInterval == -1) {
-    flushInterval = GlobalConfig.flushInterval
+  private var reader = DirectoryReader.open(writer)
+  private var searcher = new IndexSearcher(reader)
+
+  if (commitInterval == -1) {
+    commitInterval = GlobalConfig.commitInterval
   }
 
-  private val task = new java.util.TimerTask {def run() = writer.commit()}
-  new java.util.Timer().schedule(task, 0, flushInterval)
-  task.run()
+  private val task = new java.util.TimerTask {def run() = {
+    if (writer.hasUncommittedChanges) {
+      writer.commit()
+      val newReader = DirectoryReader.openIfChanged(reader)
+      reader.close()
+      reader = newReader
+      searcher = new IndexSearcher(reader)
+    }
+  }}
 
-  val reader = DirectoryReader.open(dir)
-  val searcher = new IndexSearcher(reader)
+  new java.util.Timer().schedule(task, 0, commitInterval)
+  task.run()
 
   private def createDocument(kv: Map[String, String]): Document = {
     val document = new Document()
@@ -45,12 +54,10 @@ class VNode(val id: String, var flushInterval: Int = -1) {
 
   def write(kv: Map[String, String]): Unit = {
     writer.addDocument(createDocument(kv))
-    writer.commit()
   }
 
   def search(kv: Map[String, String]): List[Map[String, String]] = {
     val docs = mutable.ListBuffer[Map[String, String]]()
-    val searcher = new IndexSearcher(DirectoryReader.open(dir))
     val hits = searcher.search(buildQuery(kv), 10000) //TODO allow all results
     hits.scoreDocs.map(d => {
       val doc = new mutable.HashMap[String, String]()
