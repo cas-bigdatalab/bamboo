@@ -12,7 +12,7 @@ import org.apache.lucene.store.FSDirectory
 
 import scala.collection.mutable
 
-class VNode(val id: String, var commitInterval: Int = -1) {
+class VNode(val id: String, var commitInterval: Int = -1, val realtime: Boolean = false) {
   private val dir = FSDirectory.open(Paths.get(s"data/vNode_$id"))
   private val analyzer = new StandardAnalyzer()
   private val writerConfig = new IndexWriterConfig(analyzer)
@@ -26,7 +26,7 @@ class VNode(val id: String, var commitInterval: Int = -1) {
     commitInterval = GlobalConfig.commitInterval
   }
 
-  private val task = new java.util.TimerTask {def run() = {
+  private val commiteTask = new java.util.TimerTask {def run() = {
     if (writer.hasUncommittedChanges) {
       writer.commit()
       val newReader = DirectoryReader.openIfChanged(reader)
@@ -36,8 +36,10 @@ class VNode(val id: String, var commitInterval: Int = -1) {
     }
   }}
 
-  new java.util.Timer().schedule(task, 0, commitInterval)
-  task.run()
+  if (!realtime) {
+    new java.util.Timer().schedule(commiteTask, 0, commitInterval)
+    commiteTask.run()
+  }
 
   private def createDocument(kv: Map[String, String]): Document = {
     val document = new Document()
@@ -54,6 +56,9 @@ class VNode(val id: String, var commitInterval: Int = -1) {
 
   def write(kv: Map[String, String]): Unit = {
     writer.addDocument(createDocument(kv))
+    if (realtime) {
+      commiteTask.run()
+    }
   }
 
   def search(kv: Map[String, String]): List[Map[String, String]] = {
@@ -73,12 +78,16 @@ class VNode(val id: String, var commitInterval: Int = -1) {
 
   def delete(kv: Map[String, String]): Unit = {
     writer.deleteDocuments(buildQuery(kv))
-    writer.commit()
+    if (realtime) {
+      commiteTask.run()
+    }
   }
 
   def deleteAll(): Unit = {
     writer.deleteAll()
-    writer.commit()
+    if (realtime) {
+      commiteTask.run()
+    }
   }
   
 }
