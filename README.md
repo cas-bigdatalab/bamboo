@@ -1,0 +1,1 @@
+Bamboo targets at updating and searching tens of billion semi-structure documents at real time.
