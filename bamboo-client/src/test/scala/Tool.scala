@@ -1,5 +1,6 @@
-object Tool {
-  // scalastyle:off
+import org.apache.logging.log4j.scala.Logging
+
+object Tool extends Logging {
   def buildIndex(indexF: Map[String, String] => Any, batchCNT: Int, batchSize: Int, warmingCNT: Int = 10): Unit = {
     var start: Long = 0
     (1  to batchCNT + warmingCNT).foreach(oid => {
@@ -13,7 +14,7 @@ object Tool {
       })
     })
     val end = System.currentTimeMillis
-    println(s"write ${batchCNT * batchSize / (end - start).toFloat * 1000} nodes per second to bamboo")
+    logger.info(s"write ${batchCNT * batchSize / (end - start).toFloat * 1000} nodes per second to bamboo")
   }
 
   def searchIndex(searchF: Map[String, String] => List[Map[String, String]], totalCNT: Int): Unit = {
@@ -23,7 +24,7 @@ object Tool {
       val q = Map("name" -> s"bluejoe_${oid*interval}")
       val ret = searchF(q)
       val end = System.currentTimeMillis
-      println(s"search: $q, return: $ret, cost ${end - start} ms")
+      logger.info(s"search: $q, return: $ret, cost ${end - start} ms")
     })
   }
 

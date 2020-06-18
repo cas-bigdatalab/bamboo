@@ -9,7 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>bamboo-server</module>
-        <module>bamboo-rpc</module>
+        <module>bamboo-common</module>
         <module>bamboo-client</module>
     </modules>
     <properties>
@@ -24,6 +24,21 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api-scala_2.11</artifactId>
+            <version>12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
         </dependency>
     </dependencies>
     <build>

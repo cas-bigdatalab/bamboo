@@ -8,9 +8,9 @@ import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
 import net.neoremind.kraps.rpc.{RpcCallContext, RpcEndpoint, RpcEnv, RpcEnvServerConfig}
 
 import scala.collection.mutable
+import org.apache.logging.log4j.scala.Logging
 
-
-class NodeService(val address: String, val peers: List[String], val replicaFactor: Int) {
+class NodeService (val address: String, val peers: List[String], val replicaFactor: Int) {
 
   private val ipPort = address.split(':')
   val ip = ipPort(0)
@@ -29,19 +29,17 @@ class NodeService(val address: String, val peers: List[String], val replicaFacto
 
 }
 
-class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val replicaFactor: Int) extends RpcEndpoint {
+class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val replicaFactor: Int) extends RpcEndpoint with Logging {
 
   private val config = new Config(peers, replicaFactor)
   private lazy val peerRpcs = config.nodesInfo.map(address => (address -> new NodeRpc(address))).toMap
   private lazy val vNodes = config.getVNodeByNodeInfo(rpcEnv.address.hostPort).map(vid => (vid -> new VNode(vid))).toMap
 
-  // scalastyle:off
-  println(s"${rpcEnv.address.hostPort} hold vNodes: $vNodes")
+  logger.info(s"${rpcEnv.address.hostPort} hold vNodes: $vNodes")
 
   override def onStart(): Unit = {
-    println("start node endpoint")
+    logger.info("start node endpoint")
   }
-  // scalastyle:on
 
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
     case AttributeWrite(msg, vNodeID) =>
@@ -96,10 +94,8 @@ class NodeEndpoint(override val rpcEnv: RpcEnv, val peers: List[String], val rep
       }
   }
 
-  // scalastyle:off
   override def onStop(): Unit = {
-    println("stop node endpoint")
+    logger.info("stop node endpoint")
   }
-  // scalastyle:on
 
 }

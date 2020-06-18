@@ -4,12 +4,13 @@ import cn.pandadb.bamboo.rpc.msg._
 import net.neoremind.kraps.RpcConf
 import net.neoremind.kraps.rpc.{RpcAddress, RpcEnvClientConfig}
 import net.neoremind.kraps.rpc.netty.NettyRpcEnvFactory
+import org.apache.logging.log4j.scala.Logging
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NodeRpc(val address: String) {
+class NodeRpc(val address: String) extends Logging {
 
   private val ipPort = address.split(':')
   val ip = ipPort(0)
@@ -24,12 +25,12 @@ class NodeRpc(val address: String) {
   def filterNodes(kv: Map[String, String], vNodeID: String = "-1"): List[Map[String, String]] = {
     endPointRef.askWithRetry[List[Map[String, String]]](AttributeRead(kv, vNodeID))
   }
-  // scalastyle:off
+
   def addNodeAsyn(docsToAdded: Map[String, String], vNodeID: String = "-1"): Future[String] = {
     val future = endPointRef.ask[String](AttributeWrite(docsToAdded, vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => { } // println(s"$value")
-      case scala.util.Failure(e) => println(s"Got error: $e")
+      case scala.util.Success(value) =>
+      case scala.util.Failure(e) => logger.error(e)
     }
     future
   }
@@ -40,8 +41,8 @@ class NodeRpc(val address: String) {
   def deleteNode(docsToBeDeleted: Map[String, String], vNodeID: String = "-1"): Unit = {
     val future = endPointRef.ask[String](AttributeDelete(docsToBeDeleted, vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"$value")
-      case scala.util.Failure(e) => println(s"Got error: $e")
+      case scala.util.Success(value) => logger.info(value)
+      case scala.util.Failure(e) => logger.error(e)
     }
     Await.result(future, Duration.apply("30s"))
   }
@@ -49,10 +50,10 @@ class NodeRpc(val address: String) {
   def deleteAll(vNodeID: String = "-1"): Unit = {
     val future = endPointRef.ask[String](AllDeleting(vNodeID))
     future.onComplete {
-      case scala.util.Success(value) => println(s"$value")
-      case scala.util.Failure(e) => println(s"Got error: $e")
+      case scala.util.Success(value) => logger.info(value)
+      case scala.util.Failure(e) => logger.info(e)
     }
     Await.result(future, Duration.apply("30s"))
   }
-  // scalastyle:on
+
 }

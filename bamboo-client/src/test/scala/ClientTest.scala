@@ -2,7 +2,7 @@
 import cn.pandadb.bamboo.Client
 import org.junit.{After, Before, Test}
 
-class ClientTest{
+class ClientTest {
 
   val client = new Client(List("localhost:11234"))
 

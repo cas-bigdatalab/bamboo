@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.pandadb.bamboo</groupId>
-            <artifactId>bamboo-rpc</artifactId>
+            <artifactId>bamboo-common</artifactId>
             <version>${pandadb.bamboo.version}</version>
             <scope>compile</scope>
         </dependency>
